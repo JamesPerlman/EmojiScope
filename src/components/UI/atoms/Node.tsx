@@ -1,19 +1,18 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconName } from '@fortawesome/fontawesome-common-types';
 import 'tailwindcss/tailwind.css';
 
 interface NodeProps {
-  icon: IconName
-};
+  content: string;
+  style?: React.CSSProperties;
+}
 
 const NodeElement: React.FC<NodeProps> = (props) => {
-  const { icon } = props;
+  const { content, style } = props;
   return (
-    <div className="rounded w-5 h-5">
-      <FontAwesomeIcon icon={icon} className="w-full h-full"/>
+    <div className="rounded w-5 h-5" style={style}>
+      {content}
     </div>
   );
-}
+};
 
 export const Node = React.memo(NodeElement);
