@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script lang="javascript">
+      const timeOf = (func) => {
+        var t0 = performance.now();
+        func();
+        var t1 = performance.now();
+
+        return t1 - t0;
+      }
+      
+      function doSomethingALot(func) {
+        let i = -11111111;
+        while (i < 11111111) {
+          func(i);
+          i++;
+        }
+        return i;
+      }
+
+      function branch(x) {
+        if (x > 0) {
+          return Math.cos(x);
+        } else {
+          return 1;
+        }
+      }
+
+      function nonBranch(x) {
+        return Math.min(x, 0);
+      }
+      
+      window.onload = function() {
+        //const nonBranchTime = ;
+        //console.log(`non branch time is ${timeOf(() => doSomethingALot(nonBranch))}`);
+
+        
+        console.log(`branch time is ${timeOf(() => doSomethingALot(branch))}`);
+
+        //console.log(`branch / non = ${branchTime / nonBranchTime}`);
+      }
+    </script>
+  </head>
+  <body>
+
+  </body>
+</html>

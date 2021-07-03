@@ -1,0 +1,22 @@
+ReactiveNode should be an organism that subscribes to mouse position.
+
+Inside ReactiveNode is the content which should be a molecule or an atom
+
+pass in a "calculatePosition" prop based off it's index and the current mouse position
+
+eased interpolation from last to new position
+
+
+ReactiveGrid is the container component.  calculatePosition is defined here and its reference is defined via useCallback which depends on spacing, size, etc
+
+
+how to handle transition to detail view?
+
+how to handle reactive loading (cascading fade in / scale / reposition effect)
+
+typing into filter causes matching emoji to highlight and nonmatching ones to fade slightly, then a couple seconds later the ReactiveGrid reconfigures to display only the new match criteria
+
+
+To "shrink" the grid when filtering, a node's new position should become the closest unoccupied position to the 'center' of the grid.  Note that the center is not necessarily (0,0)
+
+Come up with a function that transforms a 1D index into 2D indices (x,y) based on a spiral about the origin.
