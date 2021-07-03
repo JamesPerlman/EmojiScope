@@ -1,11 +1,11 @@
 import React from 'react';
 import './App.css';
-import { NodeField } from './components';
+import { ReactiveGrid } from './components';
 
 function App() {
   return (
     <div className="App">
-      <NodeField />
+      <ReactiveGrid itemRadius={20} itemSpacing={5} />
     </div>
   );
 }

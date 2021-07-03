@@ -1,1 +1,1 @@
-export * from './Node';
+export * from './EmojiView';
