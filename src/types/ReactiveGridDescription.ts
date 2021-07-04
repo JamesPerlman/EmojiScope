@@ -46,7 +46,7 @@ export class ReactiveGridDescription {
 
     // convenience vars
     const s = maxScale;
-    const s_2 = 0.5 * maxScale;
+    //const s_2 = 0.5 * maxScale;
     const r = effectRadius;
 
     /*
