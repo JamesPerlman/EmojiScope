@@ -38,7 +38,7 @@ const ReactiveGridElement: React.FC<ReactiveGridProps> = (props) => {
   const { itemRadius, itemSpacing } = props;
 
   const grid = useMemo(
-    () => new ReactiveGridDescription(itemRadius, itemSpacing, 2.0, 100),
+    () => new ReactiveGridDescription(itemRadius, itemSpacing, 1, 103),
     [itemRadius, itemSpacing],
   );
 

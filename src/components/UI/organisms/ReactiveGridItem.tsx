@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { add, Point2D, ReactiveGridDescription } from '../../../types';
+import { add, Index2D, Point2D, ReactiveGridDescription } from '../../../types';
 import { useMousePosition } from '../../../hooks';
 
 type ReactiveGridItemProps = React.PropsWithChildren<{
@@ -13,10 +13,12 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
 
   const mousePosition = useMousePosition();
 
-  const itemPosition = useMemo(() => grid.getItemPosition(xIndex, yIndex), [grid, xIndex, yIndex]);
+  const indices: Index2D = useMemo(() => ({ x: xIndex, y: yIndex }), [xIndex, yIndex]);
+
+  const itemPosition = useMemo(() => grid.getItemPosition(indices), [grid, indices]);
 
   const itemDisplacement = useMemo(
-    () => grid.getItemDisplacement(itemPosition, mousePosition),
+    () => grid.getDisplacement(itemPosition, mousePosition),
     [grid, itemPosition, mousePosition],
   );
 

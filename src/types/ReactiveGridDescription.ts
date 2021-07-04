@@ -1,105 +1,135 @@
 import { Point2D } from './Point2D';
 import { MathUtil } from '../utils';
 
-export type GridPositionFunction = (xIndex: number, yIndex: number) => Point2D;
+/*
+ * Some useful types
+ */
+export type Index2D = { x: number; y: number };
 
-// TODO: refactor to module pattern, it will be faster.
-// TODO: magRadius -> effectRadius ?
+export type GridItemPositionFunction = (indices: Index2D) => Point2D;
+export type GridPointScaleFunction = (point: Point2D, effectCenter?: Point2D) => number;
+export type GridPointDisplacementFunction = (point: Point2D, effectCenter?: Point2D) => Point2D;
+
+/*
+ * ReactiveGridDescription generates geometric functions that allow elements to be magnified and displaced around a focus point
+ */
 export class ReactiveGridDescription {
-  readonly itemRadius: number;
-  readonly itemSpacing: number;
-  readonly maxScale: number;
-  readonly magRadius: number;
+  /*
+   * informational props
+   */
+  public readonly itemRadius: number;
+  public readonly itemSpacing: number;
+  public readonly maxScale: number;
+  public readonly effectRadius: number;
 
-  private readonly slotRadius: number;
+  /*
+   * grid geometry functions that will be generated in the constructor
+   */
+  public readonly getScale: GridPointScaleFunction;
+  public readonly getDisplacement: GridPointDisplacementFunction;
+  public readonly getItemPosition: GridItemPositionFunction;
 
-  constructor(itemRadius: number, itemSpacing: number, maxScale: number, magRadius: number) {
+  /*
+   * What a beautiful constructor this is.
+   * It creates all the optimized functions we need in order to calculate some really cool reactive grid effects.
+   */
+  public constructor(
+    itemRadius: number,
+    itemSpacing: number,
+    maxScale: number,
+    effectRadius: number,
+  ) {
     this.itemRadius = itemRadius;
     this.itemSpacing = itemSpacing;
     this.maxScale = maxScale;
-    this.magRadius = magRadius;
+    this.effectRadius = effectRadius;
 
-    // calculate some helper variables
-    this.slotRadius = itemRadius + itemSpacing;
-  }
+    // convenience vars
+    const s = maxScale;
+    const s_2 = 0.5 * maxScale;
+    const r = effectRadius;
 
-  getItemPosition: GridPositionFunction = (xIndex, yIndex) => ({
-    x: (2.0 * xIndex + MathUtil.modulo(yIndex, 2)) * this.slotRadius,
-    y: MathUtil.SQRT3 * yIndex * this.slotRadius,
-  });
+    /*
+     * Defining geometric functions here optimizes them for speed as they will be used by many components concurrently
+     */
 
-  /** HELPER FUNCTIONS */
-  // TODO: clean these up and generate them in the constructor
-  // scale helper function
-  private cosineScale = (t: number, p: number): number => {
-    return 1.0 + 0.5 * this.maxScale * (Math.cos((Math.PI / this.magRadius) * (t - p)) + 1.0);
-  };
-
-  // displacement helper function (the integral of the scale helper function)
-  private sineDisplacement = (t: number, p: number): number => {
-    return (
-      0.5 * (2.0 + this.maxScale) * t +
-      ((this.magRadius * this.maxScale) / (2.0 * Math.PI)) *
-        Math.sin((Math.PI / this.magRadius) * (t - p))
-    );
-  };
-
-  /**
-   * PRIVATE PARAMETRIC SCALE / DISPLACEMENT GETTERS
-   * ONE DIMENSION ONLY
-   */
-
-  /**
-   * Gets scale along a single axis
-   * @param {number} t - a variable value along the axis of interest
-   * @param {number} p - a fixed value (point of interest) at which the scale is maximum
-   * @return {number}
-   */
-  private getParametricScale = (t: number, p: number): number => {
-    return Math.abs(t - p) < this.magRadius ? this.cosineScale(t, p) : 1.0;
-  };
-
-  /**
-   * Gets displacement along a single axis
-   * @param {number} t - a variable value along the axis of interest
-   * @param {number} p - a fixed value (point of interest) at which the displacement is maximum
-   * @return {number}
-   */
-  private getParametricDisplacement = (t: number, p: number): number => {
-    if (t < p - this.magRadius) {
-      return t - (p - this.magRadius) + this.sineDisplacement(p - this.magRadius, p);
-    }
-    if (t > p + this.magRadius) {
-      return t - (p + this.magRadius) + this.sineDisplacement(p + this.magRadius, p);
-    }
-    return this.sineDisplacement(t, p) - this.sineDisplacement(p, p);
-  };
-
-  /**
-   * PUBLIC SCALE / DISPLACEMENT GETTERS
-   * TWO DIMENSIONS
-   */
-
-  public getItemScale = (itemPosition: Point2D, pointOfInterest?: Point2D): number => {
-    if (pointOfInterest === undefined) {
-      return 1;
-    }
-
-    // scale should be minimum of parametric scale for x and y
-    const xScale = this.getParametricScale(itemPosition.x, pointOfInterest.x);
-    const yScale = this.getParametricScale(itemPosition.y, pointOfInterest.y);
-
-    return Math.min(xScale, yScale);
-  };
-
-  public getItemDisplacement = (itemPosition: Point2D, pointOfInterest?: Point2D): Point2D => {
-    if (pointOfInterest === undefined) {
-      return { x: 0, y: 0 };
-    }
-
-    return {
-      x: this.getParametricDisplacement(itemPosition.x, pointOfInterest.x),
-      y: this.getParametricDisplacement(itemPosition.y, pointOfInterest.y),
+    // scale helper function (single-dimension, unbounded, non-piecewise)
+    const fScale = (t: number, p: number): number => {
+      return 1.0 + 0.5 * s * (Math.cos((Math.PI / r) * (t - p)) + 1.0);
     };
-  };
+
+    // displacement helper function is the indefinite integral of fScale (single-dimension, unbounded, non-piecewise)
+    const fDisp = (t: number, p: number): number => {
+      return 0.5 * (2.0 + s) * t + ((r * s) / (2.0 * Math.PI)) * Math.sin((Math.PI / r) * (t - p));
+    };
+
+    // since fDisp is an indefinite integral we need to calculate the C value so that the piecewise version of the displacement function is continuous
+    // gDisp includes this necessary calculation
+    const gDisp = (t: number, p: number): number => {
+      return fDisp(t, p) - fDisp(p, p);
+    };
+
+    /*
+     * Now we can construct the parametric (single-dimension only) piecewise versions of these functions
+     */
+
+    // piecewise scale function (scale value follows the fScale curve when t is within the effect range, otherwise scale = 1)
+    const pScale = (t: number, p: number): number => {
+      return Math.abs(t - p) < r ? fScale(t, p) : 1;
+    };
+
+    // piecewise displacement function (value follows the gDisp curve when t is within the effect range, otherwise it follows a linear path continuous with gDisp)
+    const pDisp = (t: number, p: number): number => {
+      if (t < p - r) {
+        // t is less than point of interest - effect range
+        return t - (p - r) + gDisp(p - r, p);
+      }
+      if (t > p + r) {
+        // t is greater than point of interest + effect range
+        return t - (p + r) + gDisp(p + r, p);
+      }
+      // here we can safely assume t is within the effect range
+      return gDisp(t, p);
+    };
+
+    /*
+     * Finally we can compose the above functions to create our full 2D scale and position calculation functions
+     */
+
+    this.getScale = (point, effectCenter?) => {
+      if (effectCenter === undefined) {
+        // no focus point, normal scale
+        return 1;
+      }
+
+      // scale should be minimum of parametric scale for x and y
+      const xScale = pScale(point.x, effectCenter.x);
+      const yScale = pScale(point.y, effectCenter.y);
+
+      return Math.min(xScale, yScale);
+    };
+
+    this.getDisplacement = (point, effectCenter?) => {
+      if (effectCenter === undefined) {
+        // no focus point, no displacement
+        return { x: 0, y: 0 };
+      }
+
+      return {
+        x: pDisp(point.x, effectCenter.x),
+        y: pDisp(point.y, effectCenter.y),
+      };
+    };
+
+    /*
+     * And of course we need to generate a function that returns the point where an undisplaced item should be
+     */
+
+    const slotRadius = itemRadius + itemSpacing;
+
+    this.getItemPosition = (indices) => ({
+      x: (2.0 * indices.x + MathUtil.modulo(indices.y, 2)) * slotRadius,
+      y: MathUtil.SQRT3 * indices.y * slotRadius,
+    });
+  }
 }
