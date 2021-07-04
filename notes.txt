@@ -20,3 +20,9 @@ typing into filter causes matching emoji to highlight and nonmatching ones to fa
 To "shrink" the grid when filtering, a node's new position should become the closest unoccupied position to the 'center' of the grid.  Note that the center is not necessarily (0,0)
 
 Come up with a function that transforms a 1D index into 2D indices (x,y) based on a spiral about the origin.
+
+It could "walk" in a spiral using a for/while loop, could be slow but it could work for v1.  Would prefer a "flat" function that determines the x/y index via a mathematical formula.
+
+start at (x,y) then walk clockwise, checking for collisions and choosing the grid slot that has not yet been filled.
+
+the function could be lazy & memoized to increase efficiency.  that would work.
