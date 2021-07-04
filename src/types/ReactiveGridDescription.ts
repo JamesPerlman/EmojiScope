@@ -1,5 +1,6 @@
 import { Point2D } from './Point2D';
 import { MathUtil } from '../utils';
+import { ReactiveGrid } from '../components';
 
 /*
  * Some useful types
@@ -31,8 +32,8 @@ export class ReactiveGridDescription {
 
   /*
    * What a beautiful constructor this is.
-   * It creates all the optimized functions we need in order to calculate some really cool reactive grid effects.
    */
+
   public constructor(
     itemRadius: number,
     itemSpacing: number,
@@ -44,59 +45,55 @@ export class ReactiveGridDescription {
     this.maxScale = maxScale;
     this.effectRadius = effectRadius;
 
-    // convenience vars
-    const s = maxScale;
-    //const s_2 = 0.5 * maxScale;
+    this.getScale = ReactiveGridDescription.createScaleFunction(effectRadius, maxScale);
+
+    this.getDisplacement = ReactiveGridDescription.createDisplacementFunction(
+      effectRadius,
+      maxScale,
+    );
+
+    this.getItemPosition = ReactiveGridDescription.createItemPositionFunction(
+      itemRadius,
+      itemSpacing,
+    );
+  }
+
+  // TODO: these factory functions could probably exist in a util
+  /*
+   * getScale function factory
+   */
+
+  private static createScaleFunction(
+    effectRadius: number,
+    maxScale: number,
+  ): GridPointScaleFunction {
+    // define some helper coefficients
+
     const r = effectRadius;
+    const s = maxScale;
 
-    /*
-     * Defining geometric functions here optimizes them for speed as they will be used by many components concurrently
-     */
+    const a = 0.5 * s;
+    const b = Math.PI / r;
 
-    // scale helper function (single-dimension, unbounded, non-piecewise)
+    // scale helper function (the curve portion, single-dimension, unbounded, non-piecewise)
     const fScale = (t: number, p: number): number => {
-      return 1.0 + 0.5 * s * (Math.cos((Math.PI / r) * (t - p)) + 1.0);
-    };
-
-    // displacement helper function is the indefinite integral of fScale (single-dimension, unbounded, non-piecewise)
-    const fDisp = (t: number, p: number): number => {
-      return 0.5 * (2.0 + s) * t + ((r * s) / (2.0 * Math.PI)) * Math.sin((Math.PI / r) * (t - p));
-    };
-
-    // since fDisp is an indefinite integral we need to calculate the C value so that the piecewise version of the displacement function is continuous
-    // gDisp includes this necessary calculation
-    const gDisp = (t: number, p: number): number => {
-      return fDisp(t, p) - fDisp(p, p);
+      return 1.0 + a * (Math.cos(b * (t - p)) + 1.0);
     };
 
     /*
      * Now we can construct the parametric (single-dimension only) piecewise versions of these functions
+     * This function's value follows the fScale curve when t is within the effect range, otherwise returns 1
      */
 
-    // piecewise scale function (scale value follows the fScale curve when t is within the effect range, otherwise scale = 1)
     const pScale = (t: number, p: number): number => {
       return Math.abs(t - p) < r ? fScale(t, p) : 1;
     };
 
-    // piecewise displacement function (value follows the gDisp curve when t is within the effect range, otherwise it follows a linear path continuous with gDisp)
-    const pDisp = (t: number, p: number): number => {
-      if (t < p - r) {
-        // t is less than point of interest - effect range
-        return t - (p - r) + gDisp(p - r, p);
-      }
-      if (t > p + r) {
-        // t is greater than point of interest + effect range
-        return t - (p + r) + gDisp(p + r, p);
-      }
-      // here we can safely assume t is within the effect range
-      return gDisp(t, p);
-    };
-
     /*
-     * Finally we can compose the above functions to create our full 2D scale and position calculation functions
+     * Now that we have all the pieces we can return the two-dimensional scale function
      */
 
-    this.getScale = (point, effectCenter?) => {
+    return (point, effectCenter?) => {
       if (effectCenter === undefined) {
         // no focus point, normal scale
         return 1;
@@ -108,11 +105,52 @@ export class ReactiveGridDescription {
 
       return Math.min(xScale, yScale);
     };
+  }
 
-    this.getDisplacement = (point, effectCenter?) => {
+  /*
+   * Displacement function factory
+   * creates an optimized and efficient displacement function
+   */
+
+  private static createDisplacementFunction(
+    effectRadius: number,
+    maxScale: number,
+  ): GridPointDisplacementFunction {
+    // convenience vars and coefficients
+    const s = maxScale;
+    const r = effectRadius;
+
+    const a = (2.0 + s) / 2.0;
+    const b = (r * s) / (2.0 * Math.PI);
+    const c = Math.PI / r;
+
+    const r1a = r * (1 - a);
+    const bsincr = b * Math.sin(c * r);
+
+    /*
+     * Construct the piecewise displacement function - see Desmos graph in research folder for how this was calculated
+     */
+    const pDisp = (t: number, p: number) => {
+      if (t < p - r) {
+        // t is less than point of interest, out of effect range
+        return t + r1a + bsincr;
+      }
+      if (t > p + r) {
+        // t is greater than point of interest, out of effect range
+        return t - r1a + bsincr;
+      }
+      // here we can safely assume t is within the effect range
+      return a * (t - p) + b * Math.sin(c * (t - p)) + p;
+    };
+
+    /*
+     * Now that we have all the pieces we can return the two-dimensional displacement function
+     */
+
+    return (point, effectCenter?) => {
       if (effectCenter === undefined) {
-        // no focus point, no displacement
-        return { x: 0, y: 0 };
+        // no effect center, no displacement
+        return point;
       }
 
       return {
@@ -120,14 +158,18 @@ export class ReactiveGridDescription {
         y: pDisp(point.y, effectCenter.y),
       };
     };
+  }
 
-    /*
-     * And of course we need to generate a function that returns the point where an undisplaced item should be
-     */
-
+  /*
+   * Item Position Function Factory
+   */
+  private static createItemPositionFunction(
+    itemRadius: number,
+    itemSpacing: number,
+  ): GridItemPositionFunction {
     const slotRadius = itemRadius + itemSpacing;
 
-    this.getItemPosition = (indices) => ({
+    return (indices) => ({
       x: (2.0 * indices.x + MathUtil.modulo(indices.y, 2)) * slotRadius,
       y: MathUtil.SQRT3 * indices.y * slotRadius,
     });

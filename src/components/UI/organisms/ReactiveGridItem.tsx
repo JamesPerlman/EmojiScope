@@ -28,11 +28,10 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
   );
 
   const reactiveStyle: React.CSSProperties = useMemo(() => {
-    const { x, y } = add(itemPosition, itemDisplacement);
+    const { x, y } = itemDisplacement;
     const s = itemScale;
     return {
       transform: `translate(${x}px, ${y}px) scale(${s}, ${s})`,
-      //translate: `${x}px ${y}px`,
     };
   }, [itemPosition, itemDisplacement, itemScale]);
 
