@@ -38,7 +38,7 @@ const ReactiveGridElement: React.FC<ReactiveGridProps> = (props) => {
   const { itemRadius, itemSpacing } = props;
 
   const grid = useMemo(
-    () => new ReactiveGridDescription(itemRadius, itemSpacing, 1, 103),
+    () => new ReactiveGridDescription(itemRadius, itemSpacing, 2, 10),
     [itemRadius, itemSpacing],
   );
 
@@ -52,7 +52,7 @@ const ReactiveGridElement: React.FC<ReactiveGridProps> = (props) => {
             grid={grid}
             xIndex={xIndex}
             yIndex={yIndex}>
-            <EmojiView key={`node_${index}`} char={emoji} style={styleForItemAtIndex(index)} />
+            <EmojiView key={`node_${index}`} char={emoji} />
           </ReactiveGridItem>
         );
       })}

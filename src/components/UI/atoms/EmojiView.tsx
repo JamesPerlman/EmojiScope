@@ -9,8 +9,8 @@ interface EmojiViewProps {
 const EmojiViewElement: React.FC<EmojiViewProps> = (props) => {
   const { char, style } = props;
   return (
-    <div className="rounded w-5 h-5 bg-white" style={style}>
-      {char}
+    <div className="bg-white rounded-full">
+      x
     </div>
   );
 };

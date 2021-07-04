@@ -22,15 +22,31 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
     [grid, itemPosition, mousePosition],
   );
 
-  const positionStyle: React.CSSProperties = useMemo(() => {
-    const { x, y } = add(itemPosition, itemDisplacement);
-    return {
-      left: x,
-      top: y,
-    };
-  }, [itemPosition, itemDisplacement]);
+  const itemScale = useMemo(
+    () => grid.getScale(itemPosition, mousePosition),
+    [grid, itemPosition, mousePosition],
+  );
 
-  return <div style={{ position: 'absolute', ...positionStyle }}>{children}</div>;
+  const reactiveStyle: React.CSSProperties = useMemo(() => {
+    const { x, y } = add(itemPosition, itemDisplacement);
+    const s = itemScale;
+    return {
+      transform: `translate(${x}px, ${y}px) scale(${s}, ${s})`,
+      //translate: `${x}px ${y}px`,
+    };
+  }, [itemPosition, itemDisplacement, itemScale]);
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        width: 2.0 * grid.itemRadius,
+        height: 2.0 * grid.itemRadius,
+        ...reactiveStyle,
+      }}>
+      {children}
+    </div>
+  );
 };
 
 export const ReactiveGridItem = React.memo(ReactiveGridItemElement);
