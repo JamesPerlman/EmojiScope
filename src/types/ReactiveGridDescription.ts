@@ -1,4 +1,4 @@
-import { Point2D } from './Point2D';
+import { add, Point2D } from './Point2D';
 import { MathUtil } from '../utils';
 import { ReactiveGrid } from '../components';
 
@@ -18,6 +18,7 @@ export class ReactiveGridDescription {
   /*
    * informational props
    */
+  public readonly center: Point2D;
   public readonly itemRadius: number;
   public readonly itemSpacing: number;
   public readonly maxScale: number;
@@ -35,11 +36,13 @@ export class ReactiveGridDescription {
    */
 
   public constructor(
+    center: Point2D,
     itemRadius: number,
     itemSpacing: number,
     maxScale: number,
     effectRadius: number,
   ) {
+    this.center = center;
     this.itemRadius = itemRadius;
     this.itemSpacing = itemSpacing;
     this.maxScale = maxScale;
@@ -53,6 +56,7 @@ export class ReactiveGridDescription {
     );
 
     this.getItemPosition = ReactiveGridDescription.createItemPositionFunction(
+      center,
       itemRadius,
       itemSpacing,
     );
@@ -164,12 +168,13 @@ export class ReactiveGridDescription {
    * Item Position Function Factory
    */
   private static createItemPositionFunction(
+    center: Point2D,
     itemRadius: number,
     itemSpacing: number,
   ): GridItemPositionFunction {
     const slotRadius = itemRadius + itemSpacing;
 
-    return (indices) => ({
+    return (indices) => add(center, {
       x: (2.0 * indices.x + MathUtil.modulo(indices.y, 2)) * slotRadius,
       y: MathUtil.SQRT3 * indices.y * slotRadius,
     });

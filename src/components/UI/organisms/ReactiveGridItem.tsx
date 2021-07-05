@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { add, Index2D, Point2D, ReactiveGridDescription } from '../../../types';
+import { Index2D, ReactiveGridDescription } from '../../../types';
 import { useMousePosition } from '../../../hooks';
 
 type ReactiveGridItemProps = React.PropsWithChildren<{
