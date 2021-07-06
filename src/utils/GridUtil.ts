@@ -39,35 +39,46 @@ export const GridUtil = {
     return (p: Index2D, axis: GridAxis, m: number): Index2D => {
       switch (axis) {
         case GridAxis.NX:
-          return {
-            x: p.x - m,
-            y: p.y,
-          };
+          return { x: p.x - m, y: p.y };
         case GridAxis.PX:
-          return {
-            x: p.x + m,
-            y: p.y,
-          };
+          return { x: p.x + m, y: p.y };
         case GridAxis.NXNY:
-          return {
-            x: p.x - dx(p.y, m),
-            y: p.y - m,
-          };
+          return { x: p.x - dx(p.y, m), y: p.y - m };
         case GridAxis.NXPY:
-          return {
-            x: p.x - dx(p.y, m),
-            y: p.y + m,
-          };
+          return { x: p.x - dx(p.y, m), y: p.y + m };
         case GridAxis.PXNY:
-          return {
-            x: p.x + dx(p.y, m),
-            y: p.y - m,
-          };
+          return { x: p.x + dx(p.y, m), y: p.y - m };
         case GridAxis.PXPY:
-          return {
-            x: p.x + dx(p.y, m),
-            y: p.y + m,
-          };
+          return { x: p.x + dx(p.y, m), y: p.y + m };
+      }
+    };
+  })(),
+
+  /**
+   * walk along the grid by 1 position along an axis
+   * @param {Index2D} p - The starting indices to translate from
+   * @param {GridAxis} axis - The axis along which to move
+   *
+   * @return {Index2D} - The translated indices
+   */
+
+  walk: (function () {
+    const dx = (py: number) => (py % 2 === 0 ? 1 : 0);
+
+    return (p: Index2D, axis: GridAxis): Index2D => {
+      switch (axis) {
+        case GridAxis.NX:
+          return { x: p.x - 1, y: p.y };
+        case GridAxis.PX:
+          return { x: p.x + 1, y: p.y };
+        case GridAxis.NXNY:
+          return { x: p.x - dx(p.y), y: p.y - 1 };
+        case GridAxis.NXPY:
+          return { x: p.x - dx(p.y), y: p.y + 1 };
+        case GridAxis.PXNY:
+          return { x: p.x + dx(p.y), y: p.y - 1 };
+        case GridAxis.PXPY:
+          return { x: p.x + dx(p.y), y: p.y + 1 };
       }
     };
   })(),
