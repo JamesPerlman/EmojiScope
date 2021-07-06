@@ -165,7 +165,7 @@ export const GridUtil = {
     };
 
     /*
-     * Now that we have all the pieces we can return the two-dimensional displacement function
+     * Now we can return the two-dimensional displacement function
      */
 
     return (point, effectCenter?) => {
