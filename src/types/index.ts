@@ -1,2 +1,3 @@
-export * from './ReactiveGridDescription';
+export * from './Index2D';
 export * from './Point2D';
+export * from './ReactiveGridDescription';

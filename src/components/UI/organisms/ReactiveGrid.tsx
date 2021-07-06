@@ -17,15 +17,23 @@ interface ReactiveGridProps {
 const numRows = 6;
 const numCols = 6;
 
-const emojis = new Array(numRows * numCols).fill('🤑');
 
 // TODO: move this into ReactiveGridDescription (maybe?)
 const get2DIndex = (index: number): { xIndex: number; yIndex: number } => {
   const yIndex = Math.floor(index / numRows);
   const xIndex = index - yIndex * numRows;
 
-  return { xIndex, yIndex };
+  return {
+    xIndex: xIndex - Math.floor(numRows / 2),
+    yIndex: yIndex - Math.floor(numCols / 2),
+  };
 };
+
+
+const emojis = new Array(numRows * numCols).fill('🤑').map((_, index) => {
+  const { xIndex, yIndex } = get2DIndex(index);
+  return `(${xIndex}, ${yIndex})`;
+});
 
 const ReactiveGridElement: React.FC<ReactiveGridProps> = (props) => {
   // destructure props

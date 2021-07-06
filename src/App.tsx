@@ -5,7 +5,7 @@ import { EmojiBrowserPage } from './components';
 
 function App() {
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full bg-white">
       <EmojiBrowserPage />
     </div>
   );
