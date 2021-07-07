@@ -1,6 +1,5 @@
 import React from 'react';
 import 'tailwindcss/tailwind.css';
-
 import { EmojiBrowserPage } from './components';
 
 function App() {
