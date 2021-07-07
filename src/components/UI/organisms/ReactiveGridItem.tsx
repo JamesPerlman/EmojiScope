@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { Index2D, ReactiveGridDescription } from '../../../types';
+import { Index2D, Grid2D } from '../../../types';
 import { useMousePosition } from '../../../hooks';
 
 type ReactiveGridItemProps = React.PropsWithChildren<{
-  grid: ReactiveGridDescription;
+  grid: Grid2D;
   xIndex: number;
   yIndex: number;
 }>;

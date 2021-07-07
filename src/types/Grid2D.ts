@@ -7,9 +7,9 @@ import {
 } from '../utils';
 
 /*
- * ReactiveGridDescription generates geometric functions that allow elements to be magnified and displaced around a focus point
+ * Grid2D generates geometric functions that allow elements to be magnified and displaced around a focus point
  */
-export class ReactiveGridDescription {
+export class Grid2D {
   /*
    * informational props
    */

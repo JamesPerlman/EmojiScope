@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import Measure, { ContentRect } from 'react-measure';
 
-import { Point2D, ReactiveGridDescription } from '../../../types';
+import { Point2D, Grid2D } from '../../../types';
 import { EmojiView } from '../atoms';
 import { ReactiveGridItem } from './ReactiveGridItem';
 
@@ -18,7 +18,7 @@ const numRows = 6;
 const numCols = 6;
 
 
-// TODO: move this into ReactiveGridDescription (maybe?)
+// TODO: move this into Grid2D (maybe?)
 const get2DIndex = (index: number): { xIndex: number; yIndex: number } => {
   const yIndex = Math.floor(index / numRows);
   const xIndex = index - yIndex * numRows;
@@ -47,7 +47,7 @@ const ReactiveGridElement: React.FC<ReactiveGridProps> = (props) => {
   // when item spacing or item radius changes, we need to recreate the grid math functions
   const grid = useMemo(
     () =>
-      new ReactiveGridDescription(gridCenter, itemRadius, itemSpacing, magnification, effectRadius),
+      new Grid2D(gridCenter, itemRadius, itemSpacing, magnification, effectRadius),
     [gridCenter, itemRadius, itemSpacing],
   );
 
