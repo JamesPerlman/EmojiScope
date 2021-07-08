@@ -9,7 +9,7 @@ import { EmojiListActionError } from './types';
 
 // Action Creators
 export const EmojiListActionCreator = {
-  fetchBegin: (): EmojiListRequestBegin => ({
+  fetchAll: (): EmojiListRequestBegin => ({
     type: EmojiListActionTypes.BeginFetchRequest,
   }),
   fetchSuccess: (data: Emoji[]): EmojiListRequestSucceed => ({

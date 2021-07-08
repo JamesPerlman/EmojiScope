@@ -1,11 +1,14 @@
 import React from 'react';
-import { ReactiveGrid } from '../UI';
+import { EmojiView, ReactiveGrid } from '../UI';
 
 import 'tailwindcss/tailwind.css';
+import { useSelectEmojis } from '../../store/emojiList/selectors';
+import { Emoji } from '../../models';
 
 type EmojiBrowserPageProps = {};
 
 const EmojiBrowserPageElement: React.FC<EmojiBrowserPageProps> = (props) => {
+  const emojis = useSelectEmojis().slice(0, 100);
   return (
     <div className="w-full h-full p-4">
       <ReactiveGrid
@@ -13,6 +16,10 @@ const EmojiBrowserPageElement: React.FC<EmojiBrowserPageProps> = (props) => {
         effectRadius={200}
         itemRadius={30}
         itemSpacing={10}
+        items={emojis}
+        renderItem={(item, number) => (
+          <EmojiView char={item.character} />
+        )}
       />
     </div>
   );

@@ -9,7 +9,7 @@ import { CategoryListActionError } from './types';
 
 // Action Creators
 export const CategoryListActionCreator = {
-  fetchBegin: (): CategoryListRequestBegin => ({
+  fetchAll: (): CategoryListRequestBegin => ({
     type: CategoryListActionTypes.BeginFetchRequest,
   }),
   fetchSuccess: (data: Category[]): CategoryListRequestSucceed => ({
