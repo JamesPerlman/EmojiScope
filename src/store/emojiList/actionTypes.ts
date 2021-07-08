@@ -3,14 +3,14 @@ import { EmojiListActionError } from './types';
 
 // Action Types Enum
 export enum EmojiListActionTypes {
-  FetchRequestDidBegin = 'EmojiListFetchRequestDidBegin',
+  BeginFetchRequest = 'EmojiListBeginFetchRequest',
   FetchRequestDidSucceed = 'EmojiListFetchRequestDidSucceed',
   FetchRequestDidFail = 'EmojiListFetchRequestDidFail',
 }
 
 // Action Object Types
 export type EmojiListRequestBegin = {
-  type: EmojiListActionTypes.FetchRequestDidBegin;
+  type: EmojiListActionTypes.BeginFetchRequest;
 };
 
 export type EmojiListRequestSucceed = {

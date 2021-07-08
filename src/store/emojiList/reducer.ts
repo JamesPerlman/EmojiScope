@@ -12,7 +12,7 @@ export const emojiListReducer = (
   action: EmojiListActions,
 ): EmojiListState => {
   switch (action.type) {
-    case EmojiListActionTypes.FetchRequestDidBegin:
+    case EmojiListActionTypes.BeginFetchRequest:
       return {
         ...state,
         loading: true,

@@ -1,3 +1,6 @@
+import { all, fork } from 'redux-saga/effects';
+import { emojiListSaga } from './emojiList/sagas';
+
 export function* rootSaga() {
-  yield {};
+  yield all([fork(emojiListSaga)]);
 }

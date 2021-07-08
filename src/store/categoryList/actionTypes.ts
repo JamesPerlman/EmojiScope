@@ -4,14 +4,14 @@ import { CategoryListActionError } from './types';
 
 // Action Types Enum
 export enum CategoryListActionTypes {
-  FetchRequestDidBegin = 'CategoryListFetchRequestDidBegin',
+  BeginFetchRequest = 'CategoryListBeginFetchRequest',
   FetchRequestDidSucceed = 'CategoryListFetchRequestDidSucceed',
   FetchRequestDidFail = 'CategoryListFetchRequestDidFail',
 }
 
 // Action Object Types
 export type CategoryListRequestBegin = {
-  type: CategoryListActionTypes.FetchRequestDidBegin;
+  type: CategoryListActionTypes.BeginFetchRequest;
 };
 
 export type CategoryListRequestSucceed = {

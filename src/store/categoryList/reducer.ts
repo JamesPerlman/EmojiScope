@@ -12,7 +12,7 @@ export const categoryListReducer = (
   action: CategoryListActions,
 ): CategoryListState => {
   switch (action.type) {
-    case CategoryListActionTypes.FetchRequestDidBegin:
+    case CategoryListActionTypes.BeginFetchRequest:
       return {
         ...state,
         loading: true,
