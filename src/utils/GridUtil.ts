@@ -23,6 +23,8 @@ export const GridUtil = {
    * @param {number} m - The magnitude along the axis to translate by
    *
    * @return {Index2D} - The translated indices
+   *
+   * I am not sure we are even gonna use this function
    */
   translate: (function () {
     // I like to encapsulate simple convenience functions like this because it's only used inside this translate function and it's very DRY
@@ -47,8 +49,10 @@ export const GridUtil = {
         case GridAxis.NXPY:
           return { x: p.x - dx(p.y, m), y: p.y + m };
         case GridAxis.PXNY:
+          // this is wrong. see walk function
           return { x: p.x + dx(p.y, m), y: p.y - m };
         case GridAxis.PXPY:
+          // this is wrong. see walk function
           return { x: p.x + dx(p.y, m), y: p.y + m };
       }
     };
@@ -76,9 +80,9 @@ export const GridUtil = {
         case GridAxis.NXPY:
           return { x: p.x - dx(p.y), y: p.y + 1 };
         case GridAxis.PXNY:
-          return { x: p.x + dx(p.y), y: p.y - 1 };
+          return { x: p.x + 1 - dx(p.y), y: p.y - 1 };
         case GridAxis.PXPY:
-          return { x: p.x + dx(p.y), y: p.y + 1 };
+          return { x: p.x + 1 - dx(p.y), y: p.y + 1 };
       }
     };
   })(),
@@ -190,11 +194,12 @@ export const GridUtil = {
     itemSpacing: number,
   ): GridItemPositionFunction {
     const slotRadius = itemRadius + itemSpacing;
+    const slotWidth = 2.0 * slotRadius;
 
-    return (indices) =>
+    return ({ x: ix, y: iy }) =>
       add(center, {
-        x: (2.0 * indices.x + MathUtil.modulo(indices.y, 2)) * slotRadius,
-        y: MathUtil.SQRT3 * indices.y * slotRadius,
+        x: ix * slotWidth + MathUtil.modulo(iy, 2) * slotRadius,
+        y: -iy * slotWidth,
       });
   },
 };
