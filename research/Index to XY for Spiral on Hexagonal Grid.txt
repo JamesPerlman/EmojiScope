@@ -1,0 +1,38 @@
+
+Moving in a spiral from (0,0)
+
+PX
+NXNY
+NX
+NXPY
+PXPY
+PX
+PX
+PXNY
+NXNY
+NXNY
+NX
+NX
+NXPY
+NXPY
+PXPY
+PXPY
+PX
+PX
+PX
+
+^^ this is wrong
+
+
+How many nodes does each ring contain?
+0: 1
+1: 1 + 1 + 1 + 1 + 2 + 1 = 1 * 5 + 2 = 7
+2: 2 + 2 + 2 + 2 + 3 + 2 = 2 * 5 + 3 = 13
+3: 3 + 3 + 3 + 3 + 4 + 3 = 3 * 5 + 4 = 19
+n: n * 5 + (n + 1) = 6n + 1;
+
+Ring starts at (px, py) and ends at (px + 1, py)
+Ring n starts at (n, 0) and ends at (n + 1, 0)
+Ring has the following set of moves:
+
+NXNY(n), NX(n), NXPY(n), PXPY(n), PX(n + 1), PXNY(n)
