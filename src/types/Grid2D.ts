@@ -2,11 +2,11 @@ import { Point2D } from './Point2D';
 import { Index2D } from './Index2D';
 
 import {
-  GridUtil,
+  GridIndexUtil,
   GridItemPositionFunction,
   GridPointDisplacementFunction,
   GridPointScaleFunction,
-  GridAxis,
+  GridLayoutUtil,
 } from '../utils';
 
 /*
@@ -30,6 +30,12 @@ export class Grid2D {
   public readonly getItemPosition: GridItemPositionFunction;
 
   /*
+   * Grid index transformers
+   */
+
+  public readonly indexToXY: (index: number) => Index2D;
+
+  /*
    * What a beautiful constructor this is.
    */
 
@@ -46,68 +52,13 @@ export class Grid2D {
     this.maxScale = maxScale;
     this.effectRadius = effectRadius;
 
-    this.getScale = GridUtil.createScaleFunction(effectRadius, maxScale);
-    this.getDisplacement = GridUtil.createDisplacementFunction(effectRadius, maxScale);
-    this.getItemPosition = GridUtil.createItemPositionFunction(center, itemRadius, itemSpacing);
+    this.getScale = GridLayoutUtil.createScaleFunction(effectRadius, maxScale);
+    this.getDisplacement = GridLayoutUtil.createDisplacementFunction(effectRadius, maxScale);
+    this.getItemPosition = GridLayoutUtil.createItemPositionFunction(
+      center,
+      itemRadius,
+      itemSpacing,
+    );
+    this.indexToXY = GridIndexUtil.indexToXY;
   }
-
-  indexToXY = (function () {
-    const ringNumNodes = (n: number): number => 6 * n + 1;
-    const ringStartPoint = (n: number): Index2D => ({ x: n, y: 0 });
-    const ringEndPoint = (n: number): Index2D => ({ x: n + 1, y: 0 });
-
-    return (index: number): Index2D => {
-      let p: Index2D = { x: 0, y: 0 };
-      if (index === 0) {
-        return p;
-      }
-
-      let n = 1; // ring index
-      let i = 1;
-      // iterate through rings
-      while (true) {
-        // make the appropriate pattern of moves until index is reached
-
-        // walk NXPY n times
-        for (let j = 1; j < n; ++j) {
-          p = GridUtil.walk(p, GridAxis.NXPY);
-          if (++i > index) return p;
-        }
-
-        // walk NX n times
-        for (let j = 1; j < n; ++j) {
-          p = GridUtil.walk(p, GridAxis.NX);
-          if (++i > index) return p;
-        }
-
-        // walk NXNY n times
-        for (let j = 1; j < n; ++j) {
-          p = GridUtil.walk(p, GridAxis.NXNY);
-          if (++i > index) return p;
-        }
-
-        // walk PXNY n times
-        for (let j = 1; j < n; ++j) {
-          p = GridUtil.walk(p, GridAxis.PXNY);
-          if (++i > index) return p;
-        }
-
-        // walk PX n+1 times
-        for (let j = 1; j < n + 1; ++j) {
-          p = GridUtil.walk(p, GridAxis.PX);
-          if (++i > index) return p;
-        }
-
-        // walk PXPY n items
-        for (let j = 1; j < n; ++j) {
-          p = GridUtil.walk(p, GridAxis.PXPY);
-          if (++i > index) return p;
-        }
-
-        // increment ring index
-        ++n;
-        // walk over to start of next ring
-      }
-    };
-  })();
 }

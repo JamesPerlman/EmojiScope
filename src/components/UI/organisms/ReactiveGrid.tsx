@@ -59,10 +59,10 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
             const { x, y } = grid.indexToXY(index);
             return (
               <ReactiveGridItem key={`item_${index}`} grid={grid} xIndex={x} yIndex={y}>
-                <div style={{backgroundColor: 'white', width:60, height:20, fontSize: 11 }}>
+                <div style={{ backgroundColor: 'white', width: 60, height: 20, fontSize: 11 }}>
                   {index}: ({x}, {y})
-                  </div>
-                {/*{renderItem(item, index)} */}
+                </div>
+                {/*<renderItem(item, index)*/}
               </ReactiveGridItem>
             );
           })}
