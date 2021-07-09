@@ -8,14 +8,14 @@ import { Emoji } from '../../models';
 type EmojiBrowserPageProps = {};
 
 const EmojiBrowserPageElement: React.FC<EmojiBrowserPageProps> = (props) => {
-  const emojis = useSelectEmojis().slice(0, 100);
+  const emojis = useSelectEmojis().slice(0, 19);
   return (
     <div className="w-full h-full p-4">
       <ReactiveGrid
-        magnification={1.5}
+        magnification={0}
         effectRadius={200}
-        itemRadius={30}
-        itemSpacing={10}
+        itemRadius={20}
+        itemSpacing={20}
         items={emojis}
         renderItem={(item, number) => (
           <EmojiView char={item.character} />

@@ -15,19 +15,6 @@ interface ReactiveGridProps<T> {
   renderItem: (item: T, index: number) => React.ReactElement | null;
 }
 
-// TODO: move this into Grid2D
-const numRows = 6;
-const numCols = 6;
-const get2DIndex = (index: number): { xIndex: number; yIndex: number } => {
-  const yIndex = Math.floor(index / numRows);
-  const xIndex = index - yIndex * numRows;
-
-  return {
-    xIndex: xIndex - Math.floor(numRows / 2),
-    yIndex: yIndex - Math.floor(numCols / 2),
-  };
-};
-
 /*
  I would love to make ReactiveGridElement a React.FC, however since there are generic types associated with ReactiveGridProps we cannot do this.
  There are some good resources here for why this needs to be done this way https://wanago.io/2020/03/09/functional-react-components-with-generic-props-in-typescript/
@@ -69,10 +56,13 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
       {({ measureRef }) => (
         <div ref={measureRef} className="w-full h-full bg-red-600">
           {items.map((item, index) => {
-            const { xIndex, yIndex } = get2DIndex(index);
+            const { x, y } = grid.indexToXY(index);
             return (
-              <ReactiveGridItem key={`item_${index}`} grid={grid} xIndex={xIndex} yIndex={yIndex}>
-                {renderItem(item, index)}
+              <ReactiveGridItem key={`item_${index}`} grid={grid} xIndex={x} yIndex={y}>
+                <div style={{backgroundColor: 'white', width:60, height:20, fontSize: 11 }}>
+                  {index}: ({x}, {y})
+                  </div>
+                {/*{renderItem(item, index)} */}
               </ReactiveGridItem>
             );
           })}
