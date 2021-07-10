@@ -162,3 +162,30 @@ r2(i) = (-2 + sqrt(4 - 3 * (1 - i))) / 3
 It seems that just r1 is sufficient to calculate the ring index as follows:
 
 I(i) = floor(r1(i)) + 1
+
+----
+
+
+Now we can start to calculate the (x,y) coordinates for index i and skip a lot of the iteration
+For example it is now very easy to calcuale (x,y) if the index i is the start of a ring
+
+if (i === R(I(i) - 1)) {
+  return {
+    x: I(i),
+    y: 0
+  }
+}
+
+yay! ideally though, we won't want to use if-statements at all, we just want a function to calculate x and y directly
+
+However now we have a useful way to get the sub-index of the desired point within the ring it belongs to
+
+s = i - I(i)
+
+From here we could use our iterative walking algorithm to get correct point.  It's much more efficient than walking from (0,0).
+However the complexity still increases as index gets larger, probably more than O(n)
+We're still aiming for O(1)
+
+----
+
+Let's see if we can get functions to calculate the indices of the other 5 corners of the hexagon ring!

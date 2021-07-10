@@ -1,0 +1,159 @@
+Building off our previous work, we can get the index of a ring given the index of a node.
+
+We also have some functions to traverse the hexagonal grid in any straight direction over any arbitrary distance
+
+Now, given an arbitrary ring, let's get the sub-index of all 6 corners of the hexagon.
+Note that the last sub-index is not really a corner, it preceeds the first corner of the next ring.  So we don't count it in our calculations.
+
+We also have the sequence of steps it takes to complete a ring spiral given the index:
+
+the traverse(startPoint, numSteps, direction) function returns a new point which is the result of
+traversing the hexagonal grid starting from `startPoint`, taking `numSteps` steps in the defined `direction`
+
+For ring n the start point is always (n, 0)
+Also for directions like right, left, top, bottom, we assume +x is right and +y is up
+For the directions, N means negative and P means positive.  There are 6 possible directions in which one can move to an adjacent point:
+
+NX: negative-x
+PX: positive-x
+NXNY: negative-x, negative-y
+NXPY: negative-x, positive-y
+PXNY: positive-x, negative-y
+PXPY: positive-x, positive-y
+
+Here's how we walk in a spiral.
+
+But first, a little diagram of points, in this example a period is an in-between node, and p0, p1, p2, p3, p4, p5 are corner points.
+
+This actually represents ring 2 if you're counting the nodes.
+
++y
+^
+|      p2 . p1
+|     .       .
+|    p3       p0
+|     .         .
+|      p4 . . p5
+|
+ -----------------> +x
+
+// for ring n:
+// starting point is always (n, 0)
+p0 = (n, 0);
+
+// walk NXPY from p0 (n - 1) times
+p1 = traverse(p0, n - 1, NXPY)
+
+// walk NX from p1 (n-1) times
+p2 = traverse(p1, n - 1, NX)
+
+// walk NXNY from p2 (n-1) times
+p3 = traverse(p2, n - 1, NXNY)
+
+// walk PXNY from p3 (n-1) times
+p4 = traverse(p3, n - 1, PXNY)
+
+// walk PX from p4 n times
+p5 = traverse(p4, n, PX)
+
+
+/// ^^^ THIS IS ITERATIVE.  WE CAN DO BETTER!
+
+I just realized there's an easier way that doesn't rely on calculating the previous n points to get to corner point pn.
+
+// array of directions to take from center in order to generate point at index i of this array
+CD = [PX, PXPY, NXPY, NX, NXNY, PXNY]
+
+o = (0,0); // origin
+p0 = traverse(o, n, CD[0])
+p1 = traverse(o, n, CD[1])
+p2 = traverse(o, n, CD[2])
+p3 = traverse(o, n, CD[3])
+p4 = traverse(o, n, CD[4])
+p5 = traverse(o, n, CD[5]) + (1, 0) // p5 is a special case because it's an extra space over, always.
+
+-----
+
+SO, given an arbitrary index i, we can calculate the ring index n and all of its corner points (p0 - p5).
+We can also calculate the subindex of i in ring n, let's call that `si`
+
+We also can easily define the subindices of each corner point.  Let's do that.
+
+s0 = 0
+s1 = n
+s2 = 2n
+s3 = 3n
+s4 = 4n
+p5 = 5n + 1
+
+Here's the algorithm I'm thinking of:
+
+We find the two points surrounding the subindex si, let's call them (pa, sa) for (point a, subindex of point a) and (pb, sb).
+
+Then we find the direction D needed to traverse along the line from pa to pb.
+
+Then we say pi (point for index i) is equal to traverse(pa, sa - si, D).
+
+And voilá! We now have a function indexToXY(i) -> (x, y) that takes in an index and outputs the x and y with relatively low complexity!
+
+Extremely low complexity compared to counting all the previous nodes before the node at index i.
+
+---
+
+how to find the closest corner point index to subindex in question:
+
+given: i = index of node (x,y) we want to find.
+
+// I(i) gives us the index of the ring that node i is within
+// R(n) gives us the number of nodes in all rings including ring n
+// N(n) gives us the number of nodes in only ring n
+N(n) = 6n + 1
+N(n) = R(n) - R(n - 1)
+
+// IP(n, si) gives us the closest corner point to subindex si in ring n
+IP(n, si) {
+  if (si < 5 * n + 1) {
+    return min(4, floor(s / n))
+  } else {
+    return 5;
+  }
+}
+
+// SP(n, ip) gives us the subindex of the corner point at index ip (0 - 5)
+SP(n, ip) {
+  if (ip === 5) {
+    return 5 * n + 1;
+  } else {
+    return ip * n;
+  }
+}
+
+
+// ^ both of these functions are from the previous file "2. get ring by index.txt"
+
+// array of dirs between each corner point
+PD = [NXPY,NX,NXNY,PXNY,PX];
+
+function indexToXY(i) {
+  // get n (index of ring that node i is within)
+  n = I(i)
+
+  // si is subindex of i in ring n
+  si = i - R(n - 1)
+
+  // ip is corner point index of closest corner point
+  ip = IP(n, si);
+
+  // sp is subindex of that corner point
+  sp = SP(n, ip)
+
+  // calculate p_sp ( corner point at index sp )
+  p_sp = ...instructions to calc this point above
+
+  return traverse(p_sp, si - sp, PD[ip])
+
+
+  // done!!!
+}
+
+excellent job we did it :)
