@@ -146,7 +146,7 @@ const indexToXY = (function () {
         if (++i > index) return p;
       }
 
-      // walk PXPY n items
+      // walk PXPY n times
       for (let j = 1; j < n; ++j) {
         p = walk(p, GridAxis.PXPY);
         if (++i > index) return p;
@@ -163,3 +163,16 @@ const indexToXY = (function () {
 export const GridIndexUtil = {
   indexToXY,
 };
+
+
+
+// let's do some testing...
+
+for (let i = 0; i < 1000; ++i) {
+  const xy = indexToXY(i);
+  const { x, y } = xy;
+
+  if (y === 0 && x > 0) {
+    console.log(`${i}: (${x}, ${y})`);
+  }
+}
