@@ -45,3 +45,11 @@ export const indexToCoordinate = (function () {
     return traverseGrid(cornerPosition, traversalDirections[leadingCorner], traversalDistance);
   };
 })();
+
+// Another magical O(1) function which takes in a grid coordinate (Index2D) and outputs a 1D index following the spiral pattern.
+export const coordinateToIndex = (function () {
+  return function (coordinate: Index2D) {
+    // TODO: lots...
+    
+  };
+})();

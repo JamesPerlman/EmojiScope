@@ -3,7 +3,7 @@ The way we will be using the OffsetGrid and laying out nodes within it will rely
 Here are some useful functions for various properties of Rings within an OffsetGrid
 */
 
-import { add, GridDirection, Index2D, RingCorner } from '../types';
+import { add2D, GridDirection, Index2D, RingCorner } from '../types';
 import { traverseGrid } from './ArithmeticUtil';
 
 // Returns the count of all nodes up to and including a ring specified by index
@@ -55,7 +55,7 @@ export const getRingCornerPosition = (function () {
 
     // special case for corner 5, we need to add 1 to the x-value
     if (ringCorner === 5) {
-      cornerPoint = add(cornerPoint, { x: 1, y: 0 });
+      cornerPoint = add2D(cornerPoint, { x: 1, y: 0 });
     }
 
     return cornerPoint;

@@ -1,7 +1,7 @@
 type XYNumeric = {
-  x: number,
-  y: number
-}
+  x: number;
+  y: number;
+};
 
 // I wish there was a way to statically enforce x and y to be integers.
 // (without using io-ts runtime validation)
@@ -11,9 +11,16 @@ export type Index2D = XYNumeric;
 export type Point2D = XYNumeric;
 
 // TODO: look for a better way to do this...
-export function add<T extends XYNumeric>(a: T, b: T): T {
+export function add2D<T extends XYNumeric>(a: T, b: T): T {
   return {
     x: a.x + b.x,
     y: a.y + b.y,
+  } as T;
+}
+
+export function subtract2D<T extends XYNumeric>(a: T, b: T): T {
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y,
   } as T;
 }

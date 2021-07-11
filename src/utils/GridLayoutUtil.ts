@@ -5,7 +5,7 @@ The functions here are to be used on a per-grid pasis and they are for determini
 
 */
 
-import { add, Index2D, Point2D } from '../types';
+import { add2D, Index2D, Point2D } from '../types';
 import { MathUtil } from './MathUtil';
 
 export type GridItemPositionFunction = (indices: Index2D) => Point2D;
@@ -123,7 +123,7 @@ export const GridLayoutUtil = {
     const slotWidth = 2.0 * slotRadius;
 
     return ({ x: ix, y: iy }) =>
-      add(center, {
+      add2D(center, {
         x: ix * slotWidth + MathUtil.modulo(iy, 2) * slotRadius,
         y: -iy * slotWidth,
       });
