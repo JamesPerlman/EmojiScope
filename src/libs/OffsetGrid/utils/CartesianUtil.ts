@@ -11,7 +11,7 @@ import { Index2D, Point2D, subtract2D } from '../types/2DTypes';
 
 // This function defines the basic rule of an OffsetGrid:
 // Every odd-numbered row is offset by half a unit
-export function getCartesianCoordinates(gridCoordinates: Index2D): Point2D {
+export function getCartesianPoint(gridCoordinates: Index2D): Point2D {
   return {
     x: gridCoordinates.x + 0.5 * MathUtil.modulo(gridCoordinates.y, 2),
     y: gridCoordinates.y,

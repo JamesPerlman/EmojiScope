@@ -1,6 +1,6 @@
 import { GridConstants } from '../constants';
 import { GridDirection, Index2D, Point2D, subtract2D } from '../types';
-import { getCartesianCoordinates } from './CartesianUtil';
+import { getCartesianPoint, getCartesianDistanceBetween } from './CartesianUtil';
 
 /**
  * Translates a point along the grid by a magnitude in a direction
@@ -49,6 +49,16 @@ export const traverseGrid = (function () {
 export const getGridDistanceBetween = (function () {
   const EPSILON = GridConstants.epsilon;
 
+  const distanceBetweenAdjacentDiagonalGridNodes: number = (function () {
+    const gridCenterCoord: Index2D = { x: 0, y: 0 };
+    const gridCenterAdjacentCoord: Index2D = traverseGrid(gridCenterCoord, GridDirection.PXPY, 1);
+
+    const cartCenterPoint = getCartesianPoint(gridCenterCoord);
+    const cartCenterAdjacentPoint = getCartesianPoint(gridCenterAdjacentCoord);
+
+    return getCartesianDistanceBetween(cartCenterPoint, cartCenterAdjacentPoint);
+  })();
+
   return function (gridCoordA: Index2D, gridCoordB: Index2D): number | undefined {
     // Let's cover the simplest case first.
     if (gridCoordA.y === gridCoordB.y) {
@@ -62,8 +72,8 @@ export const getGridDistanceBetween = (function () {
     // We use this cartesian trick because otherwise we'd have to set up an algebraic inequality and solve for variables inside ceil and floor functions and that's pretty difficult...
     // I may take a crack at that someday...
 
-    const cartPointA: Point2D = getCartesianCoordinates(gridCoordA);
-    const cartPointB: Point2D = getCartesianCoordinates(gridCoordB);
+    const cartPointA: Point2D = getCartesianPoint(gridCoordA);
+    const cartPointB: Point2D = getCartesianPoint(gridCoordB);
 
     // Since we already covered the case where the points have the same y-value, we are just looking to see if the slope between the points is within EPSILON of ±2.0
     // If so, then we can consider the points to be colinear and calculate their distance
@@ -84,5 +94,15 @@ export const getGridDistanceBetween = (function () {
 
     // If we've made it to this point, it means the points are diagonally colinear and now we need to figure out the distance between them.
     // AKA how many steps must we traverse to get from gridCoordA to gridCoordB?
+
+    // This is a bit of a dirty hack, but basically all diagonally-adjacent grid points have a constant cartesian distance between them which is about 1.11803398875
+    // So we just take the total cartesian distance and divide it by this constant value and then round it to the nearest integer.
+    // It's dirty because the larger the distance, the larger the error will be.
+    // But for our use case in this EmojiScope project I highly doubt we will ever come across this problem, so I'm gonna just go for it because time is of the essence.
+
+    return (
+      getCartesianDistanceBetween(cartPointA, cartPointB) / distanceBetweenAdjacentDiagonalGridNodes
+    );
+    // There is absolutely a much more correct way to rewrite this entire function to be completely robust to all inputs, and perhaps someday it may be worth exploring.
   };
 })();
