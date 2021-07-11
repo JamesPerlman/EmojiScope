@@ -1,3 +1,3 @@
-export * from './2DTypes';
+export * from '../libs/OffsetGrid/types/2DTypes';
 export * from './Grid2D';
-export * from './Grid';
+export * from '../libs';

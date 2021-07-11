@@ -1,13 +1,12 @@
-import { Point2D, Index2D } from './2DTypes';
+import { Point2D, Index2D } from '../libs/OffsetGrid/types/2DTypes';
+import { indexToCoordinate } from '../libs/OffsetGrid/utils';
 
 import {
-  GridIndexUtil,
   GridItemPositionFunction,
   GridPointDisplacementFunction,
   GridPointScaleFunction,
   GridLayoutUtil,
 } from '../utils';
-import { indexToCoordinate } from './Grid/Grid2D';
 
 /*
  * Grid2D generates geometric functions that allow elements to be magnified and displaced around a focus point
