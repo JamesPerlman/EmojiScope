@@ -1,3 +1,6 @@
+Graphical research: https://www.desmos.com/calculator/mmbyjagr5j
+or file "indexToXY Desmos Equations.pdf"
+
 Building off our previous work, we can get the index of a ring given the index of a node.
 
 We also have some functions to traverse the hexagonal grid in any straight direction over any arbitrary distance
@@ -41,20 +44,20 @@ This actually represents ring 2 if you're counting the nodes.
 // starting point is always (n, 0)
 p0 = (n, 0);
 
-// walk NXPY from p0 (n - 1) times
-p1 = traverse(p0, n - 1, NXPY)
+// walk NXPY from p0 n times
+p1 = traverse(p0, n, NXPY)
 
-// walk NX from p1 (n-1) times
-p2 = traverse(p1, n - 1, NX)
+// walk NX from p1 n times
+p2 = traverse(p1, n, NX)
 
-// walk NXNY from p2 (n-1) times
-p3 = traverse(p2, n - 1, NXNY)
+// walk NXNY from p2 n times
+p3 = traverse(p2, n, NXNY)
 
-// walk PXNY from p3 (n-1) times
-p4 = traverse(p3, n - 1, PXNY)
+// walk PXNY from p3 n times
+p4 = traverse(p3, n, PXNY)
 
-// walk PX from p4 n times
-p5 = traverse(p4, n, PX)
+// walk PX from p4 (n + 1) times
+p5 = traverse(p4, n + 1, PX)
 
 
 /// ^^^ THIS IS ITERATIVE.  WE CAN DO BETTER!
@@ -88,7 +91,7 @@ p5 = 5n + 1
 
 Here's the algorithm I'm thinking of:
 
-We find the two points surrounding the subindex si, let's call them (pa, sa) for (point a, subindex of point a) and (pb, sb).
+We find the two corner points surrounding the subindex si, let's call them (pa, sa) for (point a, subindex of point a) and (pb, sb).
 
 Then we find the direction D needed to traverse along the line from pa to pb.
 
@@ -113,7 +116,7 @@ N(n) = R(n) - R(n - 1)
 // IP(n, si) gives us the closest corner point to subindex si in ring n
 IP(n, si) {
   if (si < 5 * n + 1) {
-    return min(4, floor(s / n))
+    return min(4, floor(si / n))
   } else {
     return 5;
   }

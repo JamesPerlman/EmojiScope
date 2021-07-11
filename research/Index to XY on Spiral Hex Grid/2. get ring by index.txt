@@ -40,6 +40,10 @@ let's define a function R(n) which gives us the number of nodes in all rings up 
 R(n) = r(0) + r(1) + ... + r(n - 1) + r(n)
 R(n) = ∑(0, n) r(n)
 
+
+Sum(n) = 0 + 1 + 2 + 3 + 4 + ... + (n - 2) + (n - 1) + n
+Sum(n) = ∑(0,n) n
+
 R(3) = (6 * 0 + 1) + (6 * 1 + 1) + (6 * 2 + 1) + (6 * 3 + 1)
 = (6 * 0) + 1 + (6 * 1) + 1 + (6 * 2) + 1 + (6 * 3) + 1
 = 6 * (0 + 1 + 2 + 3) + 4

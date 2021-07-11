@@ -9,7 +9,7 @@ f(n) gives us the index at ring n
 f(n) = n + 3 * n * (n + 1) 
 
 ----
-lets look at the corners, starting with the ones on the pos x-axis
+let's look at the corners, starting with the ones on the pos x-axis
 
 points along the positive x-axis (y=0, x >= 0) follow a formula.
 
