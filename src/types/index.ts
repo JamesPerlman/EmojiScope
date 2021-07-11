@@ -1,3 +1,3 @@
-export * from './Index2D';
-export * from './Point2D';
+export * from './2DTypes';
 export * from './Grid2D';
+export * from './Grid';

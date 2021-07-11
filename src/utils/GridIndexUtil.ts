@@ -99,6 +99,7 @@ const walk = (function () {
   };
 })();
 
+
 const indexToXY = (function () {
   const ringNumNodes = (n: number): number => 6 * n + 1;
   const ringStartPoint = (n: number): Index2D => ({ x: n, y: 0 });
@@ -163,16 +164,3 @@ const indexToXY = (function () {
 export const GridIndexUtil = {
   indexToXY,
 };
-
-
-
-// let's do some testing...
-
-for (let i = 0; i < 1000; ++i) {
-  const xy = indexToXY(i);
-  const { x, y } = xy;
-
-  if (y === 0 && x > 0) {
-    console.log(`${i}: (${x}, ${y})`);
-  }
-}

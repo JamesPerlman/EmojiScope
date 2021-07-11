@@ -1,5 +1,4 @@
-import { Point2D } from './Point2D';
-import { Index2D } from './Index2D';
+import { Point2D, Index2D } from './2DTypes';
 
 import {
   GridIndexUtil,
@@ -8,6 +7,7 @@ import {
   GridPointScaleFunction,
   GridLayoutUtil,
 } from '../utils';
+import { indexToCoordinate } from './Grid/Grid2D';
 
 /*
  * Grid2D generates geometric functions that allow elements to be magnified and displaced around a focus point
@@ -59,6 +59,6 @@ export class Grid2D {
       itemRadius,
       itemSpacing,
     );
-    this.indexToXY = GridIndexUtil.indexToXY;
+    this.indexToXY = indexToCoordinate;
   }
 }
