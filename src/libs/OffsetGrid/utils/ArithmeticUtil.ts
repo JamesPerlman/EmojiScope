@@ -1,6 +1,6 @@
 import { GridConstants } from '../constants';
 import { GridDirection, Index2D, Point2D, subtract2D } from '../types';
-import { getCartesianPoint, getCartesianDistanceBetween } from './CartesianUtil';
+import { getCartesianPosition, getCartesianDistanceBetween } from './CartesianUtil';
 
 /**
  * Translates a point along the grid by a magnitude in a direction
@@ -47,17 +47,9 @@ export const traverseGrid = (function () {
 // This is by design.  We only want to count the nodes in a single GridDirection.
 
 export const getGridDistanceBetween = (function () {
+  // Define some convenience vars
   const EPSILON = GridConstants.epsilon;
-
-  const distanceBetweenAdjacentDiagonalGridNodes: number = (function () {
-    const gridCenterCoord: Index2D = { x: 0, y: 0 };
-    const gridCenterAdjacentCoord: Index2D = traverseGrid(gridCenterCoord, GridDirection.PXPY, 1);
-
-    const cartCenterPoint = getCartesianPoint(gridCenterCoord);
-    const cartCenterAdjacentPoint = getCartesianPoint(gridCenterAdjacentCoord);
-
-    return getCartesianDistanceBetween(cartCenterPoint, cartCenterAdjacentPoint);
-  })();
+  const distBetweenAdjacentDiagonalNodes = GridConstants.diagonallyAdjacentNodeDistance;
 
   return function (gridCoordA: Index2D, gridCoordB: Index2D): number | undefined {
     // Let's cover the simplest case first.
@@ -72,8 +64,8 @@ export const getGridDistanceBetween = (function () {
     // We use this cartesian trick because otherwise we'd have to set up an algebraic inequality and solve for variables inside ceil and floor functions and that's pretty difficult...
     // I may take a crack at that someday...
 
-    const cartPointA: Point2D = getCartesianPoint(gridCoordA);
-    const cartPointB: Point2D = getCartesianPoint(gridCoordB);
+    const cartPointA: Point2D = getCartesianPosition(gridCoordA);
+    const cartPointB: Point2D = getCartesianPosition(gridCoordB);
 
     // Since we already covered the case where the points have the same y-value, we are just looking to see if the slope between the points is within EPSILON of ±2.0
     // If so, then we can consider the points to be colinear and calculate their distance
@@ -100,9 +92,10 @@ export const getGridDistanceBetween = (function () {
     // It's dirty because the larger the distance, the larger the error will be.
     // But for our use case in this EmojiScope project I highly doubt we will ever come across this problem, so I'm gonna just go for it because time is of the essence.
 
-    return (
-      getCartesianDistanceBetween(cartPointA, cartPointB) / distanceBetweenAdjacentDiagonalGridNodes
+    return Math.round(
+      getCartesianDistanceBetween(cartPointA, cartPointB) / distBetweenAdjacentDiagonalNodes,
     );
+
     // There is absolutely a much more correct way to rewrite this entire function to be completely robust to all inputs, and perhaps someday it may be worth exploring.
   };
 })();

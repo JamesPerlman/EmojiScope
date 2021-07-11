@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import Measure, { ContentRect } from 'react-measure';
 
-import { Point2D, Grid2D } from '../../../types';
 import { ReactiveGridItem } from './ReactiveGridItem';
+
+import { Point2D, OffsetGrid, createOffsetGrid } from '../../../libs';
+
 
 import 'tailwindcss/tailwind.css';
 
@@ -32,9 +34,9 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   const [gridCenter, setGridCenter] = useState<Point2D>({ x: 0, y: 0 });
 
   // when item spacing or item radius changes, we need to recreate the grid math functions
-  const grid = useMemo(
-    () => new Grid2D(gridCenter, itemRadius, itemSpacing, magnification, effectRadius),
-    [gridCenter, itemRadius, itemSpacing],
+  const grid: OffsetGrid = useMemo(
+    () => createOffsetGrid(itemRadius, itemSpacing, gridCenter),
+    [itemRadius, itemSpacing, gridCenter],
   );
 
   // when the grid changes size we need to update its center
@@ -56,9 +58,9 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
       {({ measureRef }) => (
         <div ref={measureRef} className="w-full h-full bg-red-600">
           {items.map((item, index) => {
-            const { x, y } = grid.indexToXY(index);
+            const { x, y } = grid.getPositionFromGridIndex(index);
             return (
-              <ReactiveGridItem key={`item_${index}`} grid={grid} xIndex={x} yIndex={y}>
+              <ReactiveGridItem key={`item_${index}`} grid={grid} index={index}>
                 <div style={{ backgroundColor: 'white', width: 60, height: 20, fontSize: 11 }}>
                   {index}: ({x}, {y})
                 </div>

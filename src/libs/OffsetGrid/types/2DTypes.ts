@@ -9,6 +9,8 @@ type XYNumeric = {
 // Basically the names for these types are just hints to the developer and make the code more readable in my opinion
 export type Index2D = XYNumeric;
 export type Point2D = XYNumeric;
+export type Vector2D = XYNumeric;
+export type Scale2D = XYNumeric;
 
 // TODO: look for a better way to do this...
 export function add2D<T extends XYNumeric>(a: T, b: T): T {

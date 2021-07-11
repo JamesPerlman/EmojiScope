@@ -7,11 +7,14 @@ It also includes convenient classes related to general cartesian geometry
 */
 
 import { MathUtil } from '../../../utils';
-import { Index2D, Point2D, subtract2D } from '../types/2DTypes';
+import { Index2D, Point2D } from '../types/2DTypes';
 
 // This function defines the basic rule of an OffsetGrid:
 // Every odd-numbered row is offset by half a unit
-export function getCartesianPoint(gridCoordinates: Index2D): Point2D {
+
+// squish y axis by a factor such that diagonally adjacent items are exactly 1 unit apart
+
+export function getCartesianPosition(gridCoordinates: Index2D): Point2D {
   return {
     x: gridCoordinates.x + 0.5 * MathUtil.modulo(gridCoordinates.y, 2),
     y: gridCoordinates.y,

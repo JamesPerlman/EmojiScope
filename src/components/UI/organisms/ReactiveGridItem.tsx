@@ -1,39 +1,38 @@
 import React, { useMemo } from 'react';
-import { Index2D, Grid2D } from '../../../types';
+import { Index2D, OffsetGrid } from '../../../types';
 import { useMousePosition } from '../../../hooks';
 
 type ReactiveGridItemProps = React.PropsWithChildren<{
-  grid: Grid2D;
-  xIndex: number;
-  yIndex: number;
+  grid: OffsetGrid;
+  index: number;
 }>;
 
 const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
-  const { children, grid, xIndex, yIndex } = props;
+  const { children, grid, index } = props;
 
-  const mousePosition = useMousePosition();
+  //const mousePosition = useMousePosition();
 
-  const indices: Index2D = useMemo(() => ({ x: xIndex, y: yIndex }), [xIndex, yIndex]);
+  const itemPosition = useMemo(() => grid.getPositionFromGridIndex(index), [grid, index]);
 
-  const itemPosition = useMemo(() => grid.getItemPosition(indices), [grid, indices]);
-
-  const itemDisplacement = useMemo(
+/*  const itemDisplacement = useMemo(
     () => grid.getDisplacement(itemPosition, mousePosition),
     [grid, itemPosition, mousePosition],
   );
-
+*/
+/*
   const itemScale = useMemo(
     () => grid.getScale(itemPosition, mousePosition),
     [grid, itemPosition, mousePosition],
   );
+  */
 
   const reactiveStyle: React.CSSProperties = useMemo(() => {
-    const { x, y } = itemDisplacement;
-    const s = itemScale;
+    const { x, y } = itemPosition;
+    const s = { x: 1, y: 1 };
     return {
-      transform: `translate(${x}px, ${y}px) scale(${s}, ${s})`,
+      transform: `translate(${x}px, ${y}px)`,
     };
-  }, [itemPosition, itemDisplacement, itemScale]);
+  }, [itemPosition]);
 
   return (
     <div
