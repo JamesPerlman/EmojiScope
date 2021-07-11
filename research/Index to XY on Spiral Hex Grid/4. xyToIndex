@@ -1,3 +1,302 @@
 Now we have to get the inverse function of indexToXY 
 
 This function takes in an arbitrary grid point (x,y) and outputs the index of that node.
+
+Again we start with the simplest case, a point along the positive x-axis
+
+Let's take the point (3, 0) for example.
+
+We know from our earlier research that this is the start node in ring 3.
+
+// number of nodes in one specific ring
+r(n) = 6 * n + 1 
+
+And that the number of nodes in all rings up to and including the current one can be calculated with this equation:
+
+// number of nodes in all rings from 0 to n:
+R(n) = (n + 1)(3n + 1)
+
+So the node index is (R(3) - 1) because nodes start at index 0
+
+------
+
+My intuition is that we first need a function to calculate the index of the ring containing the node at (x, y)
+
+Perhaps the linear distance between the node (x, y) and the origin (0, 0) will help us somehow.
+
+We could calculate all corner points of a potential ring that (x,y) is part of, and see which corner points (x,y) is between
+
+Calculate 3 lines that extend across all directiosn from the origin
+Calculate 3 lines that extend across all directions from (x,y)
+
+We will have 6 intersection points (unless (x,y) is on a ring corner of [0,4])
+All intersection points are ring corners
+
+Which 2 corner points is (x,y) between?
+
+If we know that, then we can get the ring index by either one of the corner points.
+
+
+-----
+
+We need a way to define lines on this grid.
+
+We have 6 directions we can move in, but we only really care about 3 possible line slopes because they're lines, not rays (they don't have direction, or they cover both directions).
+
+X is a line where all points have the same Y value
++XY is a line where x values increase as y values increase
+-XY is a line where x values decrease as y values increase
+
+X, +XY, and -XY can be considered Slopes
+
+enum Slope {
+  X, // just x
+  PY, // +XY
+  NY, // -XY
+}
+
+A line can be defined as a slope and a point of intersection
+
+Line(Slope, Intersect)
+
+Intersect is an arbitrary (x,y) point.
+
+We need some functions now:
+
+lineContainsPoint(line, point): bool
+getIntersection(line1, line2): point | undefined
+doLinesIntersect(line1, line2): bool
+
+
+------
+
+To calculate these functions we need to define the points that exist on any given line
+
+---
+
+Let's take the line Line(X, (0,0)).
+It contains all points (x, 0) where x is any integer.  Easy.
+
+---
+
+Let's try Line(PY, (0,0)).
+Given positive x to the right, and positive Y upward, the line looks like this: /
+It contains the points:
+traverse((0,0), PXPY, d) where d is any integer.
+
+Ok that's also easy but how do we define that as a mathematical expression instead of our utility function?
+
+
+Let's look at our traverse function in the case PXPY:
+
+function traversePXPY((0,0), m) {
+  return {
+    x: 0 + m - ceil(m / 2),
+    y: 0 + m
+  }
+}
+
+So Line(PY, (0,0)) contains all the points (m - ceil(m / 2), m)
+
+---
+
+Let's try Line(NY, (0,0)).
+
+It contains all the points in traverse((0,0), NXPY, d) where d is any integer
+{
+  x: 0 - ceil(d / 2),
+  y: 0 + d
+}
+
+----
+
+
+isPointOnLine(line, point):
+
+let line be Line(NY, (0,0))
+let point be (-1, 1)
+
+solve for d?
+
+-1 = -ceil(d/2)
+1 = d
+
+-1 = -ceil(1/2) <- true.  This point is on this line.
+
+
+Ok how about the point (0, 2);
+
+0 = -ceil(d/2)
+2 = d
+
+2 = -ceil(2/2) <- false.  This point is not on this line.
+
+Ok that's actually pretty easy!
+We just get the formula for the x,y coords based on our traverse function and test if the y value satisfies the constraints of the floor/ceil function.
+
+
+------
+
+getIntersection(line1, line2)
+
+let line1 = Line(PY, (0,0))
+let line2 = Line(NY, (2,3))
+
+from working this out by hand I know these lines intersect at (2, 4)
+
+line1: traverse((0,0), PXPY, t)
+{
+  x: t - ceil(t / 2),
+  y: t,
+}
+
+line2: traverse((2,3), NXPY, u)
+{
+  x: 2 - floor(u / 2)
+  y: 3 + u,
+}
+
+i think we are meant to solve 2 equations now:
+
+t - ceil(t / 2) = 2 - floor(u / 2)
+t = 3 + u
+
+
+(3 + u) - ceil((3 + u) / 2) = 2 - floor(u / 2)
+3 + u - ceil((3 + u) / 2) = 2 - floor(u / 2)
+1 + u - ceil((3 + u) / 2) = -floor(u / 2)
+1 = -u + ceil((3 + u) / 2) - floor(u / 2)
+
+0 = -1 - u + ceil((3 + u) / 2) - floor(u / 2)
+u = 1
+
+
+ok doing algebra with floor & ceil is gonna be a huge pain
+
+what if we convert these lines to cartesian coords?
+and the convert the intersections back into hex grid coords
+
+for lines with slope PY:
+px = ix + 0.5 * mod(iy, 2)
+py = iy
+y = mx + b
+m = 2/3
+b = py - m(px)
+b = iy - (2/3)(ix + 0.5 * mod(iy, 2))
+
+
+for lines with slope NY:
+px = ix + 0.5 * mod(iy, 2)
+py = iy
+y = mx + b
+m = -2/3
+b = py - m(px)
+b = iy + (2/3)(ix + 0.5 * mod(iy, 2))
+
+
+----
+
+step 1. get lines in cartesian slope-intercept (no lines can be vertical so it's safe to do it this way)
+
+y = m1 * x + b1
+y = m2 * x + b2
+m1 * x + b1 = m2 * x + b2
+
+m1 * x - m2 * x = b2 - b1
+x(m1 - m2) = b2 - b1
+
+px = (b2 - b1) / (m1 - m2)
+py = m1 * px + b1
+
+----
+
+step 2. convert intersection point back to hexgrid coords
+
+if y % 2 === 0
+ix = floor(px)
+
+---
+
+OK Pseudocode time
+
+function xyToIndex(nodePoint: Index2D) => index {
+  // STEP 1
+  // create 3 lines intersecting origin
+  origin = { x: 0, y: 0 }
+  originLineX = Line(origin, LineSlope.X)  // this line goes ---
+  originLineNY = Line(origin, LineSlope.NY) // this line goes \
+  originLineNY2 = Line((1,0), Lineslope.NY) // this line goes \ and goes through corner point 5 of each ring
+  originLinePY = Line(origin, LineSlope.PY) // this line goes /
+
+  // ^ maybe this line should start at { x: 1, y: 0}
+  // because then it will intersect every 5th spiral point
+
+
+  // STEP 2
+  // Test if any of these 3 lines contain `point`
+  // If so, we have a corner point.
+
+  if (lineContainsPoint(originLineX, nodePoint)) {
+    const ringIndex = nodePoint.x;
+    const totalNodeCount = sumOfAllNodesIncluding(ringIndex - 1);
+    if (nodePoint.x >= 0) { // x greater than 0 is easiest
+      // ring index is equal to nodePoint.x
+      return totalNodeCount;
+    } else { // x less than 0 is also pretty easy
+      return totalNodeCount - (3 * ringIndex);
+    }
+  }
+
+  // 
+  if (lineContainsPoint(originLineNY, nodePoint)) {
+    // how do we get the ring index this belongs to?
+    // i think it's just the y-value... wow
+    const ringIndex = Math.abs(nodePoint.y);
+    const totalNodeCount = sumOfAllNodesIncluding(ringIndex - 1);
+    if (nodePoint.y > 0) {
+      return totalNodeCount + 2 * ringIndex;
+    } else {
+      return totalNodeCount + 5 * ringIndex
+    }
+  }
+
+  if (lineContainsPoint(originLineNY2, nodePoint) && nodePoint.y < 0) {
+    const ringIndex = Math.abs(nodePoint.y);
+    const totalNodeCount = sumOfAllNodesIncluding(ringIndex);
+    return totalNodeCount;
+  }
+
+  if (lineContainsPoint(originLineNY, nodePoint)) {
+    const ringIndex = Math.abs(nodePoint.y);
+    const totalNodeCount = sumOfAllNodesIncluding(ringIndex - 1;)
+    if (nodePoint.y > 0) {
+      return totalNodeCount + ringIndex;
+    } else {
+      return totalNodeCount + 4 * ringIndex;
+    }
+  }
+
+  // ok if we made it here without returning something, we're not at a corner point
+  // we have to create 3 new intersecting lines and find where they intersect
+  // with our origin-based lines from above
+
+  // create 3 lines intersecting point
+  pointLineX = Line(nodePoint, LineSlope.X)
+  pointLineNY = Line(nodePoint, LineSlope.NY)
+  pointLinePY = Line(nodePoint, LineSlope.PY)
+
+  // Get all 6 intersections between pointLines and originLines
+
+  // Find the 2 intersections that are on either side of nodePoint
+  // Get the previous corner point (in a clockwise direction) from the nodePoint
+  // Measure distance (need inverse of traverse function) between cornerPoint and nodePoint
+  
+  // return index of cornerPoint + index of nodePoint
+
+  // done!
+}
+
+// Maybe make a Ray class instead of a Line, so it uses the same Direction and we can accommodate for the offset 6th ray 
+
+// Running out of time until monday, gonna just start coding this even tho the pseudo-code is incomplete!
+// basically just change out all the Lines for Rays

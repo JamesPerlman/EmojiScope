@@ -10,7 +10,7 @@ Note that the last sub-index is not really a corner, it preceeds the first corne
 
 We also have the sequence of steps it takes to complete a ring spiral given the index:
 
-the traverse(startPoint, numSteps, direction) function returns a new point which is the result of
+the traverseGrid(startPoint, numSteps, direction) function returns a new point which is the result of
 traversing the hexagonal grid starting from `startPoint`, taking `numSteps` steps in the defined `direction`
 
 For ring n the start point is always (n, 0)
@@ -45,19 +45,19 @@ This actually represents ring 2 if you're counting the nodes.
 p0 = (n, 0);
 
 // walk NXPY from p0 n times
-p1 = traverse(p0, n, NXPY)
+p1 = traverseGrid(p0, n, NXPY)
 
 // walk NX from p1 n times
-p2 = traverse(p1, n, NX)
+p2 = traverseGrid(p1, n, NX)
 
 // walk NXNY from p2 n times
-p3 = traverse(p2, n, NXNY)
+p3 = traverseGrid(p2, n, NXNY)
 
 // walk PXNY from p3 n times
-p4 = traverse(p3, n, PXNY)
+p4 = traverseGrid(p3, n, PXNY)
 
 // walk PX from p4 (n + 1) times
-p5 = traverse(p4, n + 1, PX)
+p5 = traverseGrid(p4, n + 1, PX)
 
 
 /// ^^^ THIS IS ITERATIVE.  WE CAN DO BETTER!
@@ -68,12 +68,12 @@ I just realized there's an easier way that doesn't rely on calculating the previ
 CD = [PX, PXPY, NXPY, NX, NXNY, PXNY]
 
 o = (0,0); // origin
-p0 = traverse(o, n, CD[0])
-p1 = traverse(o, n, CD[1])
-p2 = traverse(o, n, CD[2])
-p3 = traverse(o, n, CD[3])
-p4 = traverse(o, n, CD[4])
-p5 = traverse(o, n, CD[5]) + (1, 0) // p5 is a special case because it's an extra space over, always.
+p0 = traverseGrid(o, n, CD[0])
+p1 = traverseGrid(o, n, CD[1])
+p2 = traverseGrid(o, n, CD[2])
+p3 = traverseGrid(o, n, CD[3])
+p4 = traverseGrid(o, n, CD[4])
+p5 = traverseGrid(o, n, CD[5]) + (1, 0) // p5 is a special case because it's an extra space over, always.
 
 -----
 
@@ -95,7 +95,7 @@ We find the two corner points surrounding the subindex si, let's call them (pa, 
 
 Then we find the direction D needed to traverse along the line from pa to pb.
 
-Then we say pi (point for index i) is equal to traverse(pa, sa - si, D).
+Then we say pi (point for index i) is equal to traverseGrid(pa, sa - si, D).
 
 And voilá! We now have a function indexToXY(i) -> (x, y) that takes in an index and outputs the x and y with relatively low complexity!
 
@@ -153,7 +153,7 @@ function indexToXY(i) {
   // calculate p_sp ( corner point at index sp )
   p_sp = ...instructions to calc this point above
 
-  return traverse(p_sp, si - sp, PD[ip])
+  return traverseGrid(p_sp, si - sp, PD[ip])
 
 
   // done!!!
