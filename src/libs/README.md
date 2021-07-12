@@ -1,6 +1,12 @@
-# ShiftedGrid
+# Credits
 
-An ShiftedGrid describes a two-dimensional number system consisting of rows and columns.  It has a y-axis and an x-axis.
+I, James Perlman, did in fact make all this code, and I think it's pretty darn good for a work in progress!
+
+This could become its own library someday! ©®2021jperl™ all rights reserved (just kidding).
+
+# Theory
+
+A ShiftedGrid describes a two-dimensional number system consisting of rows and columns.  It has a y-axis and an x-axis.
 
 The grid is not intended to have a continuous domain.  The points on both axes are intended to be integers.
 
