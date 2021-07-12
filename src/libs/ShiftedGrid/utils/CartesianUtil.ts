@@ -17,12 +17,6 @@ export function gridToCart({ x: gx, y: gy }: Index2D): Point2D {
   };
 }
 
-export function getCartesianDistance(a: Point2D, b: Point2D): number {
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
 // Given a cartesian coordinate, find the nearest coordinate on the ShiftedGrid
 export function cartToGrid({ x: cx, y: cy }: Point2D): Index2D {
   const ry = Math.round(cy);
@@ -31,4 +25,11 @@ export function cartToGrid({ x: cx, y: cy }: Point2D): Index2D {
     x: m === 0 ? Math.round(cx) : Math.floor(cx) + 0.5,
     y: cy,
   };
+}
+
+// Get linear cartesian distance between points a and b
+export function getCartesianDistance(a: Point2D, b: Point2D): number {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  return Math.sqrt(dx * dx + dy * dy);
 }

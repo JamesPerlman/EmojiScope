@@ -18,14 +18,14 @@ export const CartesianSlope: { [K in GridDirection]: number } = {
   [GridDirection.NX]: 0,
   [GridDirection.PX]: 0,
   [GridDirection.NXNY]: -2,
-  [GridDirection.NXPY]: -2,
+  [GridDirection.PXPY]: -2,
   [GridDirection.PXNY]: 2,
-  [GridDirection.PXPY]: 2,
+  [GridDirection.NXPY]: 2,
 };
 
 // This is a mapping of the Direction one must traverse from the origin to reach a specific RingCorner
 // The index is inferred to be a RingCorner value in the range [0, 5]
-export const directionFromCenterToCorner: GridDirection[] = [
+export const DirectionFromCenterToCorner: GridDirection[] = [
   GridDirection.PX, // center -> p0
   GridDirection.PXPY, // center -> p1
   GridDirection.NXPY, // center -> p2

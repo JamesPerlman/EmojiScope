@@ -1,4 +1,7 @@
+import { GridConstants } from '../constants';
 import { Point2D, SlopeInterceptLine } from '../types';
+
+const { EPSILON } = GridConstants;
 
 export function getLineIntersection(
   line1: SlopeInterceptLine,
@@ -6,8 +9,8 @@ export function getLineIntersection(
 ): Point2D | undefined {
   const slopeDifference = line1.slope - line2.slope;
 
-  // Perhaps consider using an epsilon value here, for values close to zero
-  if (slopeDifference === 0) {
+  // If slopes are computationally similar enough, we assume they don't intersect.
+  if (Math.abs(slopeDifference) <= EPSILON) {
     return undefined;
   }
 

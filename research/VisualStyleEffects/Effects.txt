@@ -1,0 +1,30 @@
+ItemStyleEffect?
+GridItemEffect?
+
+Not sure what to call these, 
+
+let's say the base interface is called
+ItemStyleEffect
+
+interface ItemStyleEffect {
+  getStyle(itemPosition: Point2D, effectPosition: Point2D)
+}
+
+All ItemStyleEffects share this interface however their constructors or factory methods may be very different.
+
+It might be a good optimization to curry the getStyle function, but maybe not.  It might be an unnecessary or counterproductive micro-optimization.
+
+Anyway let's define a few effects.
+
+---------
+
+MagnificationEffect
+
+This one produces a scale & translate style that magnifies and displaces GridItems.  we already have all the code to make this happen.
+
+---------
+
+EdgeFadeEffect
+
+This one fades out objects that get close to the window's edge.
+

@@ -1,6 +1,6 @@
 import { MathUtil } from '../../../utils';
 import { GridConstants } from '../constants';
-import { indexToCoordinate } from '../utils';
+import { indexToCoordinate } from '.';
 import { Point2D, ShiftedGrid } from '../types';
 
 export const createShiftedGrid = (function () {
@@ -25,12 +25,10 @@ export const createShiftedGrid = (function () {
 
       getPositionFromGridIndex: function (index: number): Point2D {
         const baseCoord = indexToCoordinate(index);
-        const retval = {
+        return {
           x: ox + sx * gridSpaceSize * (baseCoord.x + 0.5 * MathUtil.modulo(baseCoord.y, 2)),
           y: oy + sy * gridSpaceSize * baseCoord.y,
         };
-        console.log(retval);
-        return retval;
       },
       getGridIndexFromPosition: function (position: Point2D): number {
         return 0;

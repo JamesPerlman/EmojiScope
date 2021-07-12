@@ -3,7 +3,7 @@ The way we will be using the ShiftedGrid and laying out nodes within it will rel
 Here are some useful functions for various properties of Rings within an ShiftedGrid
 */
 
-import { add2D, directionFromCenterToCorner, GridDirection, Index2D, RingCorner } from '../types';
+import { add2D, DirectionFromCenterToCorner, GridDirection, Index2D, RingCorner } from '../types';
 import { traverseGrid } from './ArithmeticUtil';
 
 // Returns the count of all nodes up to and including a ring specified by index
@@ -27,11 +27,17 @@ export function getLeadingRingCorner(ringIndex: number, nodeSubIndex: number): R
 
 // Returns the subIndex of the given RingCorner within a ring
 export function getRingCornerSubIndex(ringIndex: number, ringCorner: RingCorner): number {
-  if (ringCorner === 5) {
-    return 5 * ringIndex + 1;
-  } else {
-    return ringCorner * ringIndex;
-  }
+  // look ma, no branches!
+  return ringCorner * ringIndex + Math.max(0, ringCorner - 4);
+}
+
+// Returns the index of the given RingCorner within a ring
+export function getRingCornerIndex(ringIndex: number, ringCorner: RingCorner): number {
+  // this result is equivalent to: firstNodeIndexOfPreviousRing + ringCornerSubIndex
+  // aka: sumOfAllNodesIncluding(ringIndex - 1) + getRingCornerSubIndex(ringIndex, ringCorner);
+  // let's optimize this into an algebraic expression now:
+  // (((ringIndex - 1) + 1) * (3 * (ringIndex - 1) + 1) + (ringCorner * ringIndex + Math.max(0, ringCorner - 4));
+  return ringIndex * (3 * ringIndex + ringCorner - 2) + Math.max(0, ringCorner - 4);
 }
 
 // Returns the Index2D position of a corner of a ring
@@ -40,7 +46,7 @@ export const getRingCornerPosition = (function () {
   const origin: Index2D = { x: 0, y: 0 };
 
   return function (ringIndex: number, ringCorner: RingCorner): Index2D {
-    let cornerPoint = traverseGrid(origin, directionFromCenterToCorner[ringCorner], ringIndex);
+    let cornerPoint = traverseGrid(origin, DirectionFromCenterToCorner[ringCorner], ringIndex);
 
     // special case for corner 5, we need to add 1 to the x-value
     if (ringCorner === 5) {

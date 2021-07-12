@@ -1,5 +1,5 @@
 import { correctHorizontalTraversal } from '../utils';
-import { Index2D, GridDirection, SlopeInterceptLine, GridRay } from '../types';
+import { Index2D, GridDirection, SlopeInterceptLine, GridRay, CartesianSlope } from '../types';
 
 // I am making factory methods instead of classes because my research and intuition both indicate that this will be more performant and efficient when these functions are run many times
 // At some point I will make the time to benchmark this and see if my hypothesis is correct.
@@ -48,10 +48,10 @@ export function createGridRay(startCoord: Index2D, direction: GridDirection): Gr
       }
     },
     asLine(): SlopeInterceptLine {
-      return {
-        slope: 0,
-        intercept: 0,
-      };
+      const slope = CartesianSlope[this.direction];
+      const intercept = this.startCoord.y - slope * this.startCoord.x;
+
+      return { slope, intercept };
     },
   };
 }
