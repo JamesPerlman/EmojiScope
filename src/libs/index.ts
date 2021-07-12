@@ -1,1 +1,1 @@
-export * from './OffsetGrid';
+export * from './ShiftedGrid';

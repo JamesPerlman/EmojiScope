@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-
-import { Point2D } from '../types';
+import { Point2D } from '../libs';
 
 export const useMousePosition = (): Point2D | undefined => {
   const [coords, setCoords] = useState<Point2D | undefined>();

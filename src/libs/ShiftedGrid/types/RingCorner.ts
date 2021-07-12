@@ -10,4 +10,15 @@
     -----------------> +x
 */
 
-export type RingCorner = 0 | 1 | 2 | 3 | 4 | 5;
+export const RingCorners = {
+  first: 0,
+  second: 1,
+  third: 2,
+  fourth: 3,
+  fifth: 4,
+  sixth: 5,
+} as const;
+
+export type RingCorner = typeof RingCorners[keyof typeof RingCorners];
+
+export const RingCornerIndices = Object.values(RingCorners);

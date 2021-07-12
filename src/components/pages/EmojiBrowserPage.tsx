@@ -12,9 +12,9 @@ const EmojiBrowserPageElement: React.FC<EmojiBrowserPageProps> = (props) => {
   return (
     <div className="w-full h-full p-4">
       <ReactiveGrid
-        magnification={0}
+        magnification={1}
         effectRadius={200}
-        itemRadius={20}
+        itemRadius={40}
         itemSpacing={20}
         items={emojis}
         renderItem={(item, number) => (

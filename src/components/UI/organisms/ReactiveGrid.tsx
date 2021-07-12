@@ -3,10 +3,9 @@ import Measure, { ContentRect } from 'react-measure';
 
 import { ReactiveGridItem } from './ReactiveGridItem';
 
-import { Point2D, OffsetGrid, createOffsetGrid } from '../../../libs';
-
-
 import 'tailwindcss/tailwind.css';
+import { createMagnificationEffect } from '../../../types/ItemStyleEffect';
+import { createShiftedGrid, ShiftedGrid, Point2D } from '../../../libs';
 
 interface ReactiveGridProps<T> {
   itemRadius: number;
@@ -34,8 +33,8 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   const [gridCenter, setGridCenter] = useState<Point2D>({ x: 0, y: 0 });
 
   // when item spacing or item radius changes, we need to recreate the grid math functions
-  const grid: OffsetGrid = useMemo(
-    () => createOffsetGrid(itemRadius, itemSpacing, gridCenter),
+  const grid: ShiftedGrid = useMemo(
+    () => createShiftedGrid(itemRadius, itemSpacing, gridCenter),
     [itemRadius, itemSpacing, gridCenter],
   );
 
@@ -50,6 +49,12 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
     }
   }, []);
 
+  /* ItemStyleEffects */
+  const effects = useMemo(() => {
+    const magnify = createMagnificationEffect(effectRadius, magnification);
+    return [magnify];
+  }, [effectRadius, magnification]);
+
   /* DYNAMIC STYLES */
 
   /* RENDER */
@@ -60,7 +65,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
           {items.map((item, index) => {
             const { x, y } = grid.getPositionFromGridIndex(index);
             return (
-              <ReactiveGridItem key={`item_${index}`} grid={grid} index={index}>
+              <ReactiveGridItem key={`item_${index}`} grid={grid} index={index} effects={effects}>
                 <div style={{ backgroundColor: 'white', width: 60, height: 20, fontSize: 11 }}>
                   {index}: ({x}, {y})
                 </div>

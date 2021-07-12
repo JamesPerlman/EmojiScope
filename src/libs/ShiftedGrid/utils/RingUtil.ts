@@ -1,9 +1,9 @@
 /*
-The way we will be using the OffsetGrid and laying out nodes within it will rely heavily on the idea that a grid is a series of connected hexagonal spirals.
-Here are some useful functions for various properties of Rings within an OffsetGrid
+The way we will be using the ShiftedGrid and laying out nodes within it will rely heavily on the idea that a grid is a series of connected hexagonal spirals.
+Here are some useful functions for various properties of Rings within an ShiftedGrid
 */
 
-import { add2D, GridDirection, Index2D, RingCorner } from '../types';
+import { add2D, directionFromCenterToCorner, GridDirection, Index2D, RingCorner } from '../types';
 import { traverseGrid } from './ArithmeticUtil';
 
 // Returns the count of all nodes up to and including a ring specified by index
@@ -39,19 +39,8 @@ export const getRingCornerPosition = (function () {
   // This is just the grid's origin
   const origin: Index2D = { x: 0, y: 0 };
 
-  // This is a mapping of the Direction one must traverse from the origin to reach a specific RingCorner
-  // The index is inferred to be a RingCorner value in the range [0, 5]
-  const directionToCorner: GridDirection[] = [
-    GridDirection.PX, // center -> p0
-    GridDirection.PXPY, // center -> p1
-    GridDirection.NXPY, // center -> p2
-    GridDirection.NX, //  center -> p3
-    GridDirection.NXNY, // center -> p4
-    GridDirection.PXNY, // center -> p5
-  ];
-
   return function (ringIndex: number, ringCorner: RingCorner): Index2D {
-    let cornerPoint = traverseGrid(origin, directionToCorner[ringCorner], ringIndex);
+    let cornerPoint = traverseGrid(origin, directionFromCenterToCorner[ringCorner], ringIndex);
 
     // special case for corner 5, we need to add 1 to the x-value
     if (ringCorner === 5) {

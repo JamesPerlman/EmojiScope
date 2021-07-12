@@ -1,6 +1,4 @@
-import { Point2D } from './2DTypes';
-
-export type SlopeInterceptLine = { slope: number; intercept: number };
+import { Point2D, SlopeInterceptLine } from '../types';
 
 export function getLineIntersection(
   line1: SlopeInterceptLine,

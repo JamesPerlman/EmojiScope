@@ -1,38 +1,37 @@
 import React, { useMemo } from 'react';
-import { Index2D, OffsetGrid } from '../../../types';
 import { useMousePosition } from '../../../hooks';
+import { ShiftedGrid } from '../../../libs';
+import { ItemStyleEffect } from '../../../types';
 
 type ReactiveGridItemProps = React.PropsWithChildren<{
-  grid: OffsetGrid;
+  grid: ShiftedGrid;
   index: number;
+  effects?: ItemStyleEffect[];
 }>;
 
 const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
-  const { children, grid, index } = props;
+  const { children, grid, index, effects } = props;
 
-  //const mousePosition = useMousePosition();
+  // TODO: a way of turning on & off effects
+  // previous method was to turn them off if useMousePosition() returned undefined
+  const mousePosition = useMousePosition() ?? { x: 0, y: 0 };
 
   const itemPosition = useMemo(() => grid.getPositionFromGridIndex(index), [grid, index]);
 
-/*  const itemDisplacement = useMemo(
-    () => grid.getDisplacement(itemPosition, mousePosition),
-    [grid, itemPosition, mousePosition],
-  );
-*/
-/*
-  const itemScale = useMemo(
-    () => grid.getScale(itemPosition, mousePosition),
-    [grid, itemPosition, mousePosition],
-  );
-  */
-
-  const reactiveStyle: React.CSSProperties = useMemo(() => {
-    const { x, y } = itemPosition;
-    const s = { x: 1, y: 1 };
-    return {
-      transform: `translate(${x}px, ${y}px)`,
-    };
-  }, [itemPosition]);
+  /* Calculate reactive styles by calling each effect's `getStyle` function
+   * KNOWN ISSUE: If multiple effects output a style containing a `transform` object, the styles will not be combined correctly.
+   * AKA: The latest effect.getStyle()'s `transform` will overwrite the previous one.
+   * Currently this isn't an issue since only one of our effects is using the transform property.
+   */
+  const reactiveStyles: React.CSSProperties = useMemo(() => {
+    // combine all styles from all effects
+    return (effects ?? []).reduce((prevStyle: React.CSSProperties, curEffect: ItemStyleEffect) => {
+      return {
+        ...prevStyle,
+        ...curEffect.getStyle(itemPosition, mousePosition),
+      };
+    }, {} as React.CSSProperties);
+  }, [effects, itemPosition, mousePosition]);
 
   return (
     <div
@@ -40,7 +39,7 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
         position: 'absolute',
         width: 2.0 * grid.itemRadius,
         height: 2.0 * grid.itemRadius,
-        ...reactiveStyle,
+        ...reactiveStyles,
       }}>
       {children}
     </div>

@@ -11,7 +11,8 @@
   So for now all grids will have the same indexToXY and inverse functions.
   */
 
-import { Index2D } from '../types';
+import { Index2D } from "../libs";
+
 
 // There are six directions (pseudo-axes) a point can move along this shifted grid
 export enum GridAxis {
@@ -101,7 +102,7 @@ const walk = (function () {
 
 // This was the old way of constructing a spiral grid
 // The complexity is greater than O(n^2) so it's quite suboptimal but it was interesting to figure out the iterative approach to making a spiral grid.
-// check out the new way which is O(1) in libs/OffsetGrid/utils/IndexUtil.ts
+// check out the new way which is O(1) in libs/ShiftedGrid/utils/IndexUtil.ts
 const indexToXY = (function () {
   const ringNumNodes = (n: number): number => 6 * n + 1;
   const ringStartPoint = (n: number): Index2D => ({ x: n, y: 0 });

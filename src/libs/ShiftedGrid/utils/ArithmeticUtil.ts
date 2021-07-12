@@ -1,6 +1,17 @@
 import { GridConstants } from '../constants';
 import { GridDirection, Index2D, Point2D, subtract2D } from '../types';
-import { getCartesianPosition, getCartesianDistanceBetween } from './CartesianUtil';
+import { gridToCart, getCartesianDistance } from './CartesianUtil';
+
+// This is a helper function which 'corrects' the x value of the point being traversed to, depending on the y value of the point being traversed from
+export function correctHorizontalTraversal(fromPointY: number, traversalMagnitude: number): number {
+  if (fromPointY % 2 === 0) {
+    // For diagonal moves, if fromPointY is even we use Math.ceil...
+    return Math.ceil(traversalMagnitude / 2);
+  } else {
+    // ...and if fromPointY is odd we use Math.floor
+    return Math.floor(traversalMagnitude / 2);
+  }
+}
 
 /**
  * Translates a point along the grid by a magnitude in a direction
@@ -13,15 +24,7 @@ import { getCartesianPosition, getCartesianDistanceBetween } from './CartesianUt
  */
 export const traverseGrid = (function () {
   // This little function determines a horizontal offset, which changes based on the y-value of the row we're moving from
-  function dx(py: number, m: number): number {
-    if (py % 2 === 0) {
-      // For diagonal moves, if p.y is even we use Math.ceil...
-      return Math.ceil(m / 2);
-    } else {
-      // ...and if p.y is odd we use Math.floor
-      return Math.floor(m / 2);
-    }
-  }
+  const dx = correctHorizontalTraversal;
 
   // The actual traverse function...
   return function (p: Index2D, direction: GridDirection, m: number): Index2D {
@@ -42,7 +45,7 @@ export const traverseGrid = (function () {
   };
 })();
 
-// distanceBetween is kind of the inverse of traverseGrid.  It returns the distance between two points in an OffsetGrid if they are colinear.
+// distanceBetween is kind of the inverse of traverseGrid.  It returns the distance between two points in an ShiftedGrid if they are colinear.
 // If the points are not colinear the distance function returns undefined.
 // This is by design.  We only want to count the nodes in a single GridDirection.
 
@@ -60,12 +63,12 @@ export const getGridDistanceBetween = (function () {
 
     // Now that that's out of the way...
 
-    // We can easily test if 2 points are colinear in our OffsetGrid by determining if the slope between the two points matches up with one of the cartesian versions of our GridDirections
+    // We can easily test if 2 points are colinear in our ShiftedGrid by determining if the slope between the two points matches up with one of the cartesian versions of our GridDirections
     // We use this cartesian trick because otherwise we'd have to set up an algebraic inequality and solve for variables inside ceil and floor functions and that's pretty difficult...
     // I may take a crack at that someday...
 
-    const cartPointA: Point2D = getCartesianPosition(gridCoordA);
-    const cartPointB: Point2D = getCartesianPosition(gridCoordB);
+    const cartPointA: Point2D = gridToCart(gridCoordA);
+    const cartPointB: Point2D = gridToCart(gridCoordB);
 
     // Since we already covered the case where the points have the same y-value, we are just looking to see if the slope between the points is within EPSILON of ±2.0
     // If so, then we can consider the points to be colinear and calculate their distance
@@ -74,7 +77,7 @@ export const getGridDistanceBetween = (function () {
 
     // if dx is 0 or close enough, we can return early
     if (Math.abs(dx) < EPSILON) {
-      // OffsetGrid does not allow adjacent nodes to be directly above or below each other, so we return undefined by design.
+      // ShiftedGrid does not allow adjacent nodes to be directly above or below each other, so we return undefined by design.
       return undefined;
     }
 
@@ -93,9 +96,24 @@ export const getGridDistanceBetween = (function () {
     // But for our use case in this EmojiScope project I highly doubt we will ever come across this problem, so I'm gonna just go for it because time is of the essence.
 
     return Math.round(
-      getCartesianDistanceBetween(cartPointA, cartPointB) / distBetweenAdjacentDiagonalNodes,
+      getCartesianDistance(cartPointA, cartPointB) / distBetweenAdjacentDiagonalNodes,
     );
 
     // There is absolutely a much more correct way to rewrite this entire function to be completely robust to all inputs, and perhaps someday it may be worth exploring.
   };
 })();
+
+/**
+ * @description In cases where we are 100% sure that getGridDistanceBetween will always return a number,*
+ *  here is a convenience function that returns 0 instead of undefined so the return type is always number.
+ * Only use it if you're 100% confident that it won't return 0 (unless the input points are the same)...
+ * ...because it WILL HIDE LOGIC BUGS\
+ *
+ * Please, please, please... use it wisely.
+ * @param {Index2D} gridCoordA
+ * @param {Inndex2D} gridCoordB
+ * @return {number} a number representing the distance between gridCoordA and gridCoordB, or potentially just 0 if something went wrong
+ */
+export function unreliableGridDistanceBetween(gridCoordA: Index2D, gridCoordB: Index2D): number {
+  return getGridDistanceBetween(gridCoordA, gridCoordB) ?? 0;
+}

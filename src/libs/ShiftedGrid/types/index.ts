@@ -1,5 +1,6 @@
 export * from './2DTypes';
 export * from './GridDirection';
-export * from './OffsetGrid';
+export * from './GridRay';
 export * from './RingCorner';
+export * from './ShiftedGrid';
 export * from './SlopeInterceptLine';
