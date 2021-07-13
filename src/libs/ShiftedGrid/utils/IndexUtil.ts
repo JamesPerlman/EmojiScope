@@ -119,19 +119,18 @@ export const coordinateToIndex = (function () {
     AND NOW, the moment we've all been waiting for...
     Here's the actual function that returns the index given a targetCoord
   */
-  return function (targetCoord: Index2D): number {
+  return function (targetCoord: Index2D, referenceIndex: number): number {
     // First let's test to see if our targetCoord is contained within any of the centerRays
-    centerRays.find((ray) => ray.contains(targetCoord));
+    // centerRays.find((ray) => ray.contains(targetCoord));
     for (const [i, ray] of centerRays.entries()) {
       if (ray.contains(targetCoord)) {
         // looks like targetCoord is a corner point! easy peasy.
 
         // check out unreliableGridDistanceBetween to see why I named it that... It's reliable in this case, I promise!
-        const ringIndex =
-          unreliableGridDistanceBetween(ray.startCoord, targetCoord) + (((i + 1) % 6) === 0 ? 1 : 0);
+        const ringIndex = unreliableGridDistanceBetween(ray.startCoord, targetCoord);
 
-        // the (i as RingCorner) cast is safe because centerRays has 6 items and thus i will always be in the range [0, 5]
-        return getRingCornerIndex(ringIndex, i as RingCorner);
+        const resultIndex = getRingCornerIndex(ringIndex, i as RingCorner);
+        return resultIndex;
       }
     }
 
@@ -191,6 +190,7 @@ export const coordinateToIndex = (function () {
     const distanceToLeadingCorner = unreliableGridDistanceBetween(leadingCornerCoord, targetCoord);
     const firstIndexInTargetRing = getFirstNodeIndexInRing(ringIndex);
 
-    return firstIndexInTargetRing + distanceToLeadingCorner;
+    const retVal = firstIndexInTargetRing + distanceToLeadingCorner;
+    return retVal;
   };
 })();

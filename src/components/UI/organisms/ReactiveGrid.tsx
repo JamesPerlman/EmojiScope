@@ -67,7 +67,8 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
             return (
               <ReactiveGridItem key={`item_${index}`} grid={grid} index={index} effects={effects}>
                 <div style={{ backgroundColor: 'white', width: `${grid.unitSize.width}px`, height: `${grid.unitSize.height}px`, fontSize: 11 }}>
-                  {index}: ({gx}, {gy})
+                  {index}: ({gx}, {gy})<br />
+                  {grid.gridCoordToIndex({ x: gx, y: gy }, index)}
                 </div>
                 {/*<renderItem(item, index)*/}
               </ReactiveGridItem>
