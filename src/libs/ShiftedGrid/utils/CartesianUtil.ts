@@ -13,7 +13,7 @@ import { Index2D, Point2D } from '../types/2DTypes';
 export function gridToCart({ x: gx, y: gy }: Index2D): Point2D {
   return {
     x: gx + 0.5 * MathUtil.modulo(gy, 2),
-    y: gy,
+    y: -gy,
   };
 }
 
@@ -23,7 +23,7 @@ export function cartToGrid({ x: cx, y: cy }: Point2D): Index2D {
   const m = MathUtil.modulo(ry, 2);
   return {
     x: m === 0 ? Math.round(cx) : Math.floor(cx) + 0.5,
-    y: cy,
+    y: -cy,
   };
 }
 
