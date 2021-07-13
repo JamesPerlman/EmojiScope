@@ -1,7 +1,8 @@
 import { MathUtil } from '../../../utils';
 import { GridConstants } from '../constants';
 import { indexToCoordinate } from '.';
-import { Point2D, ShiftedGrid } from '../types';
+import { Index2D, Point2D, ShiftedGrid } from '../types';
+import { coordinateToIndex } from './IndexUtil';
 
 export const createShiftedGrid = (function () {
   const defaultStretchXY = { x: 1.0, y: GridConstants.yAxisCompression };
@@ -16,22 +17,35 @@ export const createShiftedGrid = (function () {
     const { x: ox, y: oy } = offsetXY;
     const { x: sx, y: sy } = stretchXY;
 
-    const gridSpaceSize = 2 * itemRadius + itemSpacing;
+    const spaceSize = 2 * itemRadius + itemSpacing;
 
     return {
       itemRadius,
       itemSpacing,
-      gridSpaceSize,
+      spaceSize,
 
-      getPositionFromGridIndex: function (index: number): Point2D {
-        const baseCoord = indexToCoordinate(index);
+      indexToGridCoord: function (index: number): Index2D {
+        const { x: bx, y: by } = indexToCoordinate(index);
         return {
-          x: ox + sx * gridSpaceSize * (baseCoord.x + 0.5 * MathUtil.modulo(baseCoord.y, 2)),
-          y: oy + sy * gridSpaceSize * baseCoord.y,
+          x: spaceSize * (bx + 0.5 * MathUtil.modulo(by, 2)),
+          y: spaceSize * by,
         };
       },
-      getGridIndexFromPosition: function (position: Point2D): number {
-        return 0;
+
+      gridCoordToIndex: coordinateToIndex,
+
+      gridCoordToScreenPoint: function ({ x, y }): Point2D {
+        return {
+          x: ox + sx * x,
+          y: oy + sy * y,
+        };
+      },
+
+      screenPointToGridCoord: function ({ x, y }): Index2D {
+        return {
+          x: (x - ox) / sx,
+          y: (y - oy) / sy,
+        };
       },
     };
   };

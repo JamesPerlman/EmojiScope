@@ -238,7 +238,7 @@ function xyToIndex(nodePoint: Index2D) => index {
 
   if (lineContainsPoint(originLineX, nodePoint)) {
     const ringIndex = nodePoint.x;
-    const totalNodeCount = sumOfAllNodesIncluding(ringIndex - 1);
+    const totalNodeCount = getSumOfAllNodesIncluding(ringIndex - 1);
     if (nodePoint.x >= 0) { // x greater than 0 is easiest
       // ring index is equal to nodePoint.x
       return totalNodeCount;
@@ -252,7 +252,7 @@ function xyToIndex(nodePoint: Index2D) => index {
     // how do we get the ring index this belongs to?
     // i think it's just the y-value... wow
     const ringIndex = Math.abs(nodePoint.y);
-    const totalNodeCount = sumOfAllNodesIncluding(ringIndex - 1);
+    const totalNodeCount = getSumOfAllNodesIncluding(ringIndex - 1);
     if (nodePoint.y > 0) {
       return totalNodeCount + 2 * ringIndex;
     } else {
@@ -262,13 +262,13 @@ function xyToIndex(nodePoint: Index2D) => index {
 
   if (lineContainsPoint(originLineNY2, nodePoint) && nodePoint.y < 0) {
     const ringIndex = Math.abs(nodePoint.y);
-    const totalNodeCount = sumOfAllNodesIncluding(ringIndex);
+    const totalNodeCount = getSumOfAllNodesIncluding(ringIndex);
     return totalNodeCount;
   }
 
   if (lineContainsPoint(originLineNY, nodePoint)) {
     const ringIndex = Math.abs(nodePoint.y);
-    const totalNodeCount = sumOfAllNodesIncluding(ringIndex - 1;)
+    const totalNodeCount = getSumOfAllNodesIncluding(ringIndex - 1;)
     if (nodePoint.y > 0) {
       return totalNodeCount + ringIndex;
     } else {

@@ -16,7 +16,7 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
   // previous method was to turn them off if useMousePosition() returned undefined
   const mousePosition = useMousePosition() ?? { x: 0, y: 0 };
 
-  const itemPosition = useMemo(() => grid.getPositionFromGridIndex(index), [grid, index]);
+  const itemPosition = useMemo(() => grid.gridCoordToScreenPoint(grid.indexToGridCoord(index)), [grid, index]);
 
   /* Calculate reactive styles by calling each effect's `getStyle` function
    * KNOWN ISSUE: If multiple effects output a style containing a `transform` object, the styles will not be combined correctly.
@@ -37,8 +37,8 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
     <div
       style={{
         position: 'absolute',
-        width: 2.0 * grid.itemRadius,
-        height: 2.0 * grid.itemRadius,
+        width: grid.spaceSize,
+        height: grid.spaceSize,
         ...reactiveStyles,
       }}>
       {children}

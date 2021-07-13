@@ -7,8 +7,13 @@ import { add2D, DirectionFromCenterToCorner, GridDirection, Index2D, RingCorner 
 import { traverseGrid } from './ArithmeticUtil';
 
 // Returns the count of all nodes up to and including a ring specified by index
-export function sumOfAllNodesIncluding(ringIndex: number) {
+export function getSumOfAllNodesIncluding(ringIndex: number) {
   return (ringIndex + 1) * (3 * ringIndex + 1);
+}
+
+// Returns the first index in the given ring
+export function getFirstNodeIndexInRing(ringIndex: number) {
+  return (ringIndex) * (3 * ringIndex - 2);
 }
 
 // Returns the index of the ring that contains the nodeIndex
@@ -31,17 +36,17 @@ export function getRingCornerSubIndex(ringIndex: number, ringCorner: RingCorner)
   return ringCorner * ringIndex + Math.max(0, ringCorner - 4);
 }
 
-// Returns the index of the given RingCorner within a ring
+// Returns the grid index of the given RingCorner within the full spiral
 export function getRingCornerIndex(ringIndex: number, ringCorner: RingCorner): number {
   // this result is equivalent to: firstNodeIndexOfPreviousRing + ringCornerSubIndex
-  // aka: sumOfAllNodesIncluding(ringIndex - 1) + getRingCornerSubIndex(ringIndex, ringCorner);
+  // aka: getFirstNodeIndexInRing(ringIndex) + getRingCornerSubIndex(ringIndex, ringCorner);
   // let's optimize this into an algebraic expression now:
   // (((ringIndex - 1) + 1) * (3 * (ringIndex - 1) + 1) + (ringCorner * ringIndex + Math.max(0, ringCorner - 4));
   return ringIndex * (3 * ringIndex + ringCorner - 2) + Math.max(0, ringCorner - 4);
 }
 
-// Returns the Index2D position of a corner of a ring
-export const getRingCornerPosition = (function () {
+// Returns the Index2D coord of a corner of a ring
+export const getRingCornerCoord = (function () {
   // This is just the grid's origin
   const origin: Index2D = { x: 0, y: 0 };
 
@@ -56,3 +61,17 @@ export const getRingCornerPosition = (function () {
     return cornerPoint;
   };
 })();
+
+
+// Returns the RingCorner value of a coord in a ring.  Fast, too!
+// input coord MUST be a CornerPoint, otherwise this result is not valid.
+
+export function getRingCornerOfCornerCoord({ x: cx, y: cy }: Index2D): RingCorner {
+  if (cy === 0) {
+    return (cx < 0) ? 3 : 0;
+  } else if (cy > 0) {
+    return (cx > 0) ? 1 : 2;
+  } else {
+    return (cx > 0) ? 5 : 4;
+  }
+}

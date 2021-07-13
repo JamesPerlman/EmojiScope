@@ -5,7 +5,7 @@ import { ReactiveGridItem } from './ReactiveGridItem';
 
 import 'tailwindcss/tailwind.css';
 import { createMagnificationEffect } from '../../../types/ItemStyleEffect';
-import { createShiftedGrid, ShiftedGrid, Point2D } from '../../../libs';
+import { createShiftedGrid, ShiftedGrid, Point2D, cartToGrid } from '../../../libs';
 
 interface ReactiveGridProps<T> {
   itemRadius: number;
@@ -63,11 +63,12 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
       {({ measureRef }) => (
         <div ref={measureRef} className="w-full h-full bg-red-600">
           {items.map((item, index) => {
-            const { x, y } = grid.getPositionFromGridIndex(index);
+            const { x: gx, y: gy } = grid.indexToGridCoord(index);
+            const { x, y } = grid.gridCoordToScreenPoint({ x: gx, y: gy });
             return (
               <ReactiveGridItem key={`item_${index}`} grid={grid} index={index} effects={effects}>
                 <div style={{ backgroundColor: 'white', width: 60, height: 20, fontSize: 11 }}>
-                  {index}: ({x}, {y})
+                  {index}: ({gx}, {gy})
                 </div>
                 {/*<renderItem(item, index)*/}
               </ReactiveGridItem>

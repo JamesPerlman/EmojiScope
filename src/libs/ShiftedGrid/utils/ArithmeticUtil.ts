@@ -134,6 +134,19 @@ export function areGridCoordsColinear(gridCoordA: Index2D, gridCoordB: Index2D):
 }
 
 /**
+ * This function checks to see if coord p is within a rectangular area formed by coords a and b
+ */
+
+export function isCoordBetween(p: Index2D, a: Index2D, b: Index2D) {
+  const xMin = Math.min(a.x, b.x);
+  const xMax = Math.max(a.x, b.x);
+  const yMin = Math.min(a.y, b.y);
+  const yMax = Math.max(a.y, b.y);
+
+  return (p.x >= xMin) && (p.x <= xMax) && (p.y >= yMin) && (p.y <= yMax);
+}
+
+/**
  * @description In cases where we are 100% sure that getGridDistanceBetween will always return a number,*
  *  here is a convenience function that returns 0 instead of undefined so the return type is always number.
  * Only use it if you're 100% confident that it won't return 0 (unless the input points are the same)...

@@ -8,18 +8,26 @@ import {
   RingCornerIndices,
 } from '../types';
 
-import { getGridDistanceBetween, traverseGrid, unreliableGridDistanceBetween } from './ArithmeticUtil';
+import {
+  areGridCoordsColinear,
+  getGridDistanceBetween,
+  isCoordBetween,
+  traverseGrid,
+  unreliableGridDistanceBetween,
+} from './ArithmeticUtil';
 import { isIndexEven } from './ArrayUtil';
 import { cartToGrid } from './CartesianUtil';
+import { objectMin } from './CompareUtil';
 import { createGridRay } from './GridRayUtil';
 import { getLineIntersection } from './LineUtil';
 import {
+  getFirstNodeIndexInRing,
   getLeadingRingCorner,
   getRingCornerIndex,
-  getRingCornerPosition,
+  getRingCornerOfCornerCoord,
+  getRingCornerCoord,
   getRingCornerSubIndex,
   getRingIndex,
-  sumOfAllNodesIncluding,
 } from './RingUtil';
 
 // The magical O(1) function that returns an Index2D given a single nodeIndex
@@ -41,7 +49,7 @@ export const indexToCoordinate = (function () {
     const ringIndex = getRingIndex(nodeIndex);
 
     // get the sub-index of the node in its ring
-    const nodeSubIndex = nodeIndex - sumOfAllNodesIncluding(ringIndex - 1);
+    const nodeSubIndex = nodeIndex - getFirstNodeIndexInRing(ringIndex);
 
     // get the corner point ID of this ring closest to nodeSubIndex, but whose subIndex within the ring is less than nodeSubIndex.
     const leadingCorner = getLeadingRingCorner(ringIndex, nodeSubIndex);
@@ -50,7 +58,7 @@ export const indexToCoordinate = (function () {
     const cornerSubIndex = getRingCornerSubIndex(ringIndex, leadingCorner);
 
     // get the Index2D position of the RingCorner
-    const cornerPosition = getRingCornerPosition(ringIndex, leadingCorner);
+    const cornerPosition = getRingCornerCoord(ringIndex, leadingCorner);
 
     // calculate the distance we need to traverse from cornerSubIndex to nodeSubIndex
     const traversalDistance = nodeSubIndex - cornerSubIndex;
@@ -80,7 +88,37 @@ export const coordinateToIndex = (function () {
   // Remember that 2 rays would produce the same line because lines don't care about direction.
   const centerLines = centerRays.filter(isIndexEven).map((gridRay) => gridRay.asLine());
 
-  // Now here's the actual function that returns the index given a targetCoord
+  // We will need this highly-specialized function here later, and here alone
+  /* Once we find the intersection points between the center rays and the targetCoord rays,
+       We must find the 2 points which are:
+        1) colinear with each other
+        2) on either side of the input targetCoord
+
+      So that's what this function is for.
+    */
+  function getRelevantIntersectionCoords(
+    targetCoord: Index2D,
+    gridIntersections: Index2D[],
+  ): [Index2D, Index2D] {
+    for (const [i, a] of gridIntersections.entries()) {
+      for (const [j, b] of gridIntersections.entries()) {
+        // don't compare the same two gridIntersections
+        if (i !== j) {
+          if (areGridCoordsColinear(a, b) && isCoordBetween(targetCoord, a, b)) {
+            // ding ding ding!
+            return [a, b];
+          }
+        }
+      }
+    }
+    // This should never ever happen, but if we get to this point we will just return the origin for both points
+    return [origin, origin];
+  }
+
+  /*
+    AND NOW, the moment we've all been waiting for...
+    Here's the actual function that returns the index given a targetCoord
+  */
   return function (targetCoord: Index2D): number {
     // First let's test to see if our targetCoord is contained within any of the centerRays
     centerRays.find((ray) => ray.contains(targetCoord));
@@ -127,22 +165,32 @@ export const coordinateToIndex = (function () {
       }
     }
 
-    /* Now that we have all these fancy intersection points...
-       We must find the 2 points which are:
-        1) colinear with each other
-        2) on either side of the input targetCoord
-    */
-   /*
-    for (const [i, a] of gridIntersections.entries()) {
-      for (const [j, b] of gridIntersections.entries()) {
-        // don't compare the same two gridIntersections
-        if (i !== j) {
-          if (getGridDistanceBetween(a, b))
-        }
-      }
-    }
-    getGridDistanceBetween()
-    */
-   return 0;
+    // Find the two ring corner coords that targetCoord is between
+    const [cornerCoordA, cornerCoordB] = getRelevantIntersectionCoords(
+      targetCoord,
+      gridIntersections,
+    );
+
+    // Now we can get the ringIndex for either one of these cornerCoords
+    // Again we can use the unreliableGridDistance function since if something goes wrong it will just return 0
+    // But nothing should go wrong because these cornerCoords should definitely be ring corners.
+    const ringIndex = unreliableGridDistanceBetween(origin, cornerCoordA);
+
+    // We need to figure out which of these ringCorners has a lower RingCorner value
+    const ringCornerA = getRingCornerOfCornerCoord(cornerCoordA);
+    const ringCornerB = getRingCornerOfCornerCoord(cornerCoordB);
+    const leadingRingCorner = Math.min(ringCornerA, ringCornerB) as RingCorner;
+
+    // Determine its grid coordinates
+    const leadingCornerCoord = getRingCornerCoord(ringIndex, leadingRingCorner);
+
+    // And now, the grand finale...
+    // The index of targetCoord can be calculated by adding its grid-distance to the index of the RingCorner right before it!
+
+    // unreliableGridDistanceBetween is OK to use here since we have already verified that ringIndex and leadingRingCorner
+    const distanceToLeadingCorner = unreliableGridDistanceBetween(leadingCornerCoord, targetCoord);
+    const firstIndexInTargetRing = getFirstNodeIndexInRing(ringIndex);
+
+    return firstIndexInTargetRing + distanceToLeadingCorner;
   };
 })();
