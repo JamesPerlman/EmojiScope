@@ -3,6 +3,7 @@ import { GridConstants } from '../constants';
 import { indexToCoordinate } from '.';
 import { Index2D, Point2D, ShiftedGrid } from '../types';
 import { coordinateToIndex } from './IndexUtil';
+import { cartToGrid, gridToCart } from './CartesianUtil';
 
 export const createShiftedGrid = (function () {
   const defaultStretchXY = { x: 1.0, y: GridConstants.yAxisCompression };
@@ -19,37 +20,34 @@ export const createShiftedGrid = (function () {
 
     const spaceSize = 2 * itemRadius + itemSpacing;
 
+    const unitSize = {
+      width: sx * spaceSize,
+      height: sy * spaceSize,
+    };
+
     return {
       itemRadius,
       itemSpacing,
+      unitSize,
 
-      unitSize: {
-        width: sx * spaceSize,
-        height: sy * spaceSize,
-      },
-
-      indexToGridCoord: function (index: number): Index2D {
-        const { x: bx, y: by } = indexToCoordinate(index);
-        return {
-          x: spaceSize * (bx + 0.5 * MathUtil.modulo(by, 2)),
-          y: spaceSize * by,
-        };
-      },
+      indexToGridCoord: indexToCoordinate,
 
       gridCoordToIndex: coordinateToIndex,
 
-      gridCoordToScreenPoint: function ({ x, y }): Point2D {
+      gridCoordToScreenPoint: function (coord): Point2D {
+        const { x: cx, y: cy } = gridToCart(coord);
         return {
-          x: ox + sx * x,
-          y: oy + sy * y,
+          x: ox + unitSize.width * cx,
+          y: oy + unitSize.height * cy,
         };
       },
 
-      screenPointToGridCoord: function ({ x, y }): Index2D {
-        return {
-          x: (x - ox) / sx,
-          y: (y - oy) / sy,
+      screenPointToGridCoord: function ({ x: gx, y: gy }): Index2D {
+        const cartPoint = {
+          x: (gx - ox) / unitSize.width,
+          y: (gy - oy) / unitSize.height,
         };
+        return cartToGrid(cartPoint);
       },
     };
   };
