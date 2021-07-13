@@ -19,11 +19,11 @@ export function gridToCart({ x: gx, y: gy }: Index2D): Point2D {
 
 // Given a cartesian coordinate, find the nearest coordinate on the ShiftedGrid
 export function cartToGrid({ x: cx, y: cy }: Point2D): Index2D {
-  const ry = Math.round(cy);
-  const m = MathUtil.modulo(ry, 2);
+  const gy = Math.round(-cy);
+  const m = MathUtil.modulo(gy, 2);
   return {
     x: m === 0 ? Math.round(cx) : Math.floor(cx) + 0.5,
-    y: -cy,
+    y: gy,
   };
 }
 
