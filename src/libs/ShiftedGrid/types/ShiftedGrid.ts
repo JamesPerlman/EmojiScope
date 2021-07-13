@@ -8,12 +8,12 @@
  *
  */
 
-import { Index2D, Point2D } from './2DTypes';
+import { Index2D, Point2D, Size2D } from './2DTypes';
 
 export type ShiftedGrid = {
   itemRadius: number;
   itemSpacing: number;
-  spaceSize: number;
+  unitSize: Size2D;
   indexToGridCoord: (index: number) => Index2D;
   gridCoordToIndex: (coord: Index2D) => number;
   gridCoordToScreenPoint: (coord: Index2D) => Point2D;

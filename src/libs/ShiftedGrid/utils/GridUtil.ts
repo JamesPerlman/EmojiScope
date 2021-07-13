@@ -22,7 +22,11 @@ export const createShiftedGrid = (function () {
     return {
       itemRadius,
       itemSpacing,
-      spaceSize,
+
+      unitSize: {
+        width: sx * spaceSize,
+        height: sy * spaceSize,
+      },
 
       indexToGridCoord: function (index: number): Index2D {
         const { x: bx, y: by } = indexToCoordinate(index);

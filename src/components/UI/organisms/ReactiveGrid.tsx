@@ -64,10 +64,9 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
         <div ref={measureRef} className="w-full h-full bg-red-600">
           {items.map((item, index) => {
             const { x: gx, y: gy } = grid.indexToGridCoord(index);
-            const { x, y } = grid.gridCoordToScreenPoint({ x: gx, y: gy });
             return (
               <ReactiveGridItem key={`item_${index}`} grid={grid} index={index} effects={effects}>
-                <div style={{ backgroundColor: 'white', width: 60, height: 20, fontSize: 11 }}>
+                <div style={{ backgroundColor: 'white', width: `${grid.unitSize.width}px`, height: `${grid.unitSize.height}px`, fontSize: 11 }}>
                   {index}: ({gx}, {gy})
                 </div>
                 {/*<renderItem(item, index)*/}

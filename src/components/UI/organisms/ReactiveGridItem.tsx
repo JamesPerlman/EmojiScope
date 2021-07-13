@@ -37,8 +37,8 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
     <div
       style={{
         position: 'absolute',
-        width: grid.spaceSize,
-        height: grid.spaceSize,
+        width: grid.unitSize.width,
+        height: grid.unitSize.height,
         ...reactiveStyles,
       }}>
       {children}

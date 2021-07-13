@@ -12,6 +12,11 @@ export type Point2D = XYNumeric;
 export type Vector2D = XYNumeric;
 export type Scale2D = XYNumeric;
 
+export type Size2D = {
+  width: number;
+  height: number;
+};
+
 // TODO: look for a better way to do this...
 export function add2D<T extends XYNumeric>(a: T, b: T): T {
   return {

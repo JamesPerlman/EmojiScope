@@ -9,7 +9,14 @@ interface EmojiViewProps {
 const EmojiViewElement: React.FC<EmojiViewProps> = (props) => {
   const { char, style } = props;
   return (
-    <div className="bg-white rounded-full" style={style}>
+    <div
+      className="bg-white rounded-full"
+      style={{
+        width: '100%',
+        height: '100%',
+        ...style,
+      }}
+    >
       {char}
     </div>
   );
