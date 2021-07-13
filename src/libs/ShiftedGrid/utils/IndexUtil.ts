@@ -128,7 +128,7 @@ export const coordinateToIndex = (function () {
 
         // check out unreliableGridDistanceBetween to see why I named it that... It's reliable in this case, I promise!
         const ringIndex =
-          unreliableGridDistanceBetween(ray.startCoord, targetCoord) + (i % 5 === 0 ? 1 : 0);
+          unreliableGridDistanceBetween(ray.startCoord, targetCoord) + (((i + 1) % 6) === 0 ? 1 : 0);
 
         // the (i as RingCorner) cast is safe because centerRays has 6 items and thus i will always be in the range [0, 5]
         return getRingCornerIndex(ringIndex, i as RingCorner);
