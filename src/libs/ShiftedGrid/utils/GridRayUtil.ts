@@ -24,27 +24,27 @@ export function createGridRay(startCoord: Index2D, direction: GridDirection): Gr
           // m = p1y - p2y
           // p2x === p1x - dx(p1y, m)
 
-          return p2x === p1x - dx(p1y, p1y - p2y);
+          return p2x <= p1x && p2y <= p1y && p2x === p1x - dx(p1y, p1y - p2y);
 
         case GridDirection.NXPY:
           // { p2x: p1x - dx(p1y, m), p2y: p1y + m };
           // m = p2y - p1y
           // p2x === p1x - dx(p1y, m)
 
-          return p2x === p1x - dx(p1y, p2y - p1y);
+          return p2x <= p1x && p2y >= p1y && p2x === p1x - dx(p1y, p2y - p1y);
 
         case GridDirection.PXNY:
           // { p2x: p1x + m - dx(p1y, m), p2y: p1y - m };
           // m = p1y - p2y
           // p2x === p1x + m - dx(p1y, m)
-          return p2x === p1x + (p1y - p2y) - dx(p1y, p1y - p2y);
+          return p2x >= p1x && p2y <= p1y && p2x === p1x + (p1y - p2y) - dx(p1y, p1y - p2y);
 
         case GridDirection.PXPY:
           // { p2x: p1x + m - dx(p1y, m), p2y: p1y + m }
           // m = p2y - p1y
           // p2x === p1x + m - dx(p1y, m)
 
-          return p2x === p1x + (p2y - p1y) - dx(p1y, p2y - p1y);
+          return p2x >= p1x && p2y >= p1y && p2x === p1x + (p2y - p1y) - dx(p1y, p2y - p1y);
       }
     },
     asLine(): SlopeInterceptLine {
