@@ -129,8 +129,7 @@ export const coordinateToIndex = (function () {
         // check out unreliableGridDistanceBetween to see why I named it that... It's reliable in this case, I promise!
         const ringIndex = unreliableGridDistanceBetween(ray.startCoord, targetCoord);
 
-        const resultIndex = getRingCornerIndex(ringIndex, i as RingCorner);
-        return resultIndex;
+        return getRingCornerIndex(ringIndex, i as RingCorner);
       }
     }
 
