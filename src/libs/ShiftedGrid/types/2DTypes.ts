@@ -1,4 +1,4 @@
-type XYNumeric = {
+export type XYNumeric = {
   x: number;
   y: number;
 };
@@ -31,5 +31,13 @@ export function subtract2D<T extends XYNumeric>(a: T, b: T): T {
   return {
     x: a.x - b.x,
     y: a.y - b.y,
+  } as T;
+}
+
+// returns { -x, -y } for a given XYNumeric
+export function negate2D<T extends XYNumeric>(p: T): T {
+  return {
+    x: -p.x,
+    y: -p.y,
   } as T;
 }
