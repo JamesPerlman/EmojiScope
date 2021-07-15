@@ -5,7 +5,8 @@ import { ReactiveGridItem } from './ReactiveGridItem';
 
 import 'tailwindcss/tailwind.css';
 import { createMagnificationEffect } from '../../../types/ItemStyleEffect';
-import { createShiftedGrid, ShiftedGrid, Point2D, cartToGrid } from '../../../libs';
+import { createShiftedGrid, ShiftedGrid, Point2D, cartToGrid, gridToCart } from '../../../libs';
+import { getGridQuadrant } from '../../../libs/ShiftedGrid/utils/QuadrantUtil';
 
 interface ReactiveGridProps<T> {
   itemRadius: number;
@@ -23,6 +24,16 @@ interface ReactiveGridProps<T> {
 
  Because of the way we will use ReactiveGrid in this project, this method will work, albeit a bit more confusing and verbose should we need to match the exact functionality of React.FC in the future
  */
+
+ const quadrantBGs = [
+   '#FF0000',
+   '#FFFF00',
+   '#FF00FF',
+   '#00FFFF',
+   '#00FF00',
+   '#0000FF',
+   '#AAAAAA',
+ ]
 const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElement = (props) => {
   // destructure props
   const { itemRadius, itemSpacing, magnification, effectRadius, items, renderItem } = props;
@@ -61,14 +72,20 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   return (
     <Measure bounds onResize={handleResize}>
       {({ measureRef }) => (
-        <div ref={measureRef} className="w-full h-full bg-red-600">
+        <div ref={measureRef} className="w-full h-full">
           {items.map((item, index) => {
             const { x: gx, y: gy } = grid.indexToGridCoord(index);
+            const q = getGridQuadrant({ x: gx, y: gy });
+            const c = gridToCart({ x: gx, y: gy });
+            const g = cartToGrid(c);
+            const color = quadrantBGs[q];
             return (
               <ReactiveGridItem key={`item_${index}`} grid={grid} index={index} effects={effects}>
-                <div style={{ backgroundColor: 'white', width: `${grid.unitSize.width}px`, height: `${grid.unitSize.height}px`, fontSize: 11 }}>
+                <div style={{ backgroundColor: color, width: `${grid.unitSize.width - 5}px`, height: `${grid.unitSize.height - 5}px`, fontSize: 11 }}>
                   {index}: ({gx}, {gy})<br />
-                  {grid.gridCoordToIndex({ x: gx, y: gy }, index)}
+                  {grid.gridCoordToIndex({ x: gx, y: gy }, index)}<br />
+                  {JSON.stringify(c)}<br />
+                  {JSON.stringify(g)}
                 </div>
                 {/*<renderItem(item, index)*/}
               </ReactiveGridItem>

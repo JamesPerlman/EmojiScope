@@ -6,5 +6,5 @@ export type GridRay = {
   startCoord: Index2D;
   direction: GridDirection;
   contains: (coord: Index2D) => boolean;
-  asLine: () => SlopeInterceptLine;
+  asCartLine: () => SlopeInterceptLine;
 };

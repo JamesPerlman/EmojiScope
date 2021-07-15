@@ -1,5 +1,6 @@
 import { correctHorizontalTraversal } from '../utils';
 import { Index2D, GridDirection, SlopeInterceptLine, GridRay, CartesianSlope } from '../types';
+import { gridToCart } from './CartesianUtil';
 
 // I am making factory methods instead of classes because my research and intuition both indicate that this will be more performant and efficient when these functions are run many times
 // At some point I will make the time to benchmark this and see if my hypothesis is correct.
@@ -47,9 +48,12 @@ export function createGridRay(startCoord: Index2D, direction: GridDirection): Gr
           return p2x >= p1x && p2y >= p1y && p2x === p1x + (p2y - p1y) - dx(p1y, p2y - p1y);
       }
     },
-    asLine(): SlopeInterceptLine {
+    asCartLine(): SlopeInterceptLine {
       const slope = CartesianSlope[this.direction];
-      const intercept = this.startCoord.y - slope * this.startCoord.x;
+
+      const { x: cx, y: cy } = gridToCart(startCoord);
+
+      const intercept = cy - slope * cx;
 
       return { slope, intercept };
     },

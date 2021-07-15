@@ -86,7 +86,7 @@ export const coordinateToIndex = (function () {
 
   // Let's also get an array of 3 lines representing these 6 rays
   // Remember that 2 rays would produce the same line because lines don't care about direction.
-  const centerLines = centerRays.filter(isIndexEven).map((gridRay) => gridRay.asLine());
+  const centerLines = centerRays.filter(isIndexEven).map((gridRay) => gridRay.asCartLine());
 
   // We will need this highly-specialized function here later, and here alone
   /* Once we find the intersection points between the center rays and the targetCoord rays,
@@ -104,7 +104,7 @@ export const coordinateToIndex = (function () {
       for (const [j, b] of gridIntersections.entries()) {
         // don't compare the same two gridIntersections
         if (i !== j) {
-          if (areGridCoordsColinear(a, b) && isCoordBetween(targetCoord, a, b)) {
+          if (areGridCoordsColinear(a, b) && areGridCoordsColinear(targetCoord, a) && areGridCoordsColinear(targetCoord, b) && isCoordBetween(targetCoord, a, b)) {
             // ding ding ding!
             return [a, b];
           }
@@ -112,6 +112,7 @@ export const coordinateToIndex = (function () {
       }
     }
     // This should never ever happen, but if we get to this point we will just return the origin for both points
+    // If this does happen, something is very, very wrong indeed.  Probably with the inputs
     return [origin, origin];
   }
 
@@ -121,7 +122,7 @@ export const coordinateToIndex = (function () {
   */
   return function (targetCoord: Index2D, referenceIndex: number): number {
     // First let's test to see if our targetCoord is contained within any of the centerRays
-    // centerRays.find((ray) => ray.contains(targetCoord));
+    centerRays.find((ray) => ray.contains(targetCoord));
     for (const [i, ray] of centerRays.entries()) {
       if (ray.contains(targetCoord)) {
         // looks like targetCoord is a corner point! easy peasy.
@@ -137,23 +138,30 @@ export const coordinateToIndex = (function () {
 
     // Let's create 3 lines intersecting gridCoord
     const targetLines = RingCornerIndices.filter(isIndexEven).map((corner) =>
-      createGridRay(targetCoord, DirectionFromCenterToCorner[corner]).asLine(),
+      createGridRay(targetCoord, DirectionFromCenterToCorner[corner]).asCartLine(),
     );
 
     // Now we must check for check for intersections between targetRays and centerRays
     // There should always be six intersections in total
     const gridIntersections: Index2D[] = [];
-    for (const [centerLineIndex, centerLine] of centerLines.entries()) {
+    const cartIntersections: Point2D[] = [];
+    for (const [centerRayIndex, centerRay] of centerRays.entries()) {
       for (const targetLine of targetLines) {
         // Find the cartesian intersection of these lines
-        const cartIntersection = getLineIntersection(centerLine, targetLine);
+        const cartIntersection = getLineIntersection(targetLine, centerRay.asCartLine());
         if (cartIntersection !== undefined) {
           // Now we need to convert this cartesian point back to ShiftedGrid space
           const gridIntersection = cartToGrid(cartIntersection);
+          cartIntersections.push(cartIntersection);
+
+          // if centerRay does not contain gridInstersection, skip remaining calculations
+          if (!centerRay.contains(gridIntersection)) {
+            //continue;
+          }
 
           // If the intersection point *should be* with centerRay[5] we need to adjust it by adding 1 to the x-component
           // centerRay[5] is the part of centerLine[2] whose range is y > 0
-          if (centerLineIndex === 2 && gridIntersection.y > 0) {
+          if (centerRayIndex === 5) {
             gridIntersection.x += 1;
           }
 
