@@ -70,7 +70,7 @@ export function getRingCornerOfCornerCoord({ x: cx, y: cy }: Index2D): RingCorne
   if (cy === 0) {
     return (cx < 0) ? 3 : 0;
   } else if (cy > 0) {
-    return (cx > 0) ? 1 : 2;
+    return (cx >= 0) ? 1 : 2;
   } else {
     return (cx > 0) ? 5 : 4;
   }
