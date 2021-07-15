@@ -1,22 +1,26 @@
 import React, { useMemo } from 'react';
 import { useMousePosition } from '../../../hooks';
-import { ShiftedGrid } from '../../../libs';
+import { add2D, Point2D, ShiftedGrid } from '../../../libs';
 import { ItemStyleEffect } from '../../../types';
 
 type ReactiveGridItemProps = React.PropsWithChildren<{
   grid: ShiftedGrid;
   index: number;
   effects?: ItemStyleEffect[];
+  gridOffset: Point2D;
 }>;
 
 const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
-  const { children, grid, index, effects } = props;
+  const { children, grid, index, effects, gridOffset } = props;
 
   // TODO: a way of turning on & off effects
   // previous method was to turn them off if useMousePosition() returned undefined
-  const mousePosition = useMousePosition() ?? { x: 0, y: 0 };
+  const mousePosition = /*useMousePosition() ?? */ { x: 0, y: 0 };
 
-  const itemPosition = useMemo(() => grid.gridCoordToScreenPoint(grid.indexToGridCoord(index)), [grid, index]);
+  const itemPosition = useMemo(
+    () => add2D(gridOffset, grid.gridCoordToScreenPoint(grid.indexToGridCoord(index))),
+    [grid, index, gridOffset],
+  );
 
   /* Calculate reactive styles by calling each effect's `getStyle` function
    * KNOWN ISSUE: If multiple effects output a style containing a `transform` object, the styles will not be combined correctly.

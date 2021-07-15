@@ -23,7 +23,7 @@ import {
 } from './RingUtil';
 
 // The magical O(1) function that returns an Index2D given a single nodeIndex
-export const indexToCoordinate = (function () {
+export const indexToGridCoord = (function () {
   // This is an array of directions to traverse from one RingCorner to the next one
   const traversalDirections: GridDirection[] = [
     GridDirection.NXPY, // from p0 -> p1
@@ -61,7 +61,7 @@ export const indexToCoordinate = (function () {
 })();
 
 // Another magical O(1) function which takes in a grid coordinate (Index2D) and outputs a 1D index following the spiral pattern.
-export const coordinateToIndex = (function () {
+export const gridCoordToIndex = (function () {
   const cornerRay5Origin: Index2D = { x: 1, y: 0 };
   return function (targetCoord: Index2D): number {
     // We need to find which GridQuadrant the targetCoord is in

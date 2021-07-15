@@ -1,8 +1,8 @@
 import { MathUtil } from '../../../utils';
 import { GridConstants } from '../constants';
-import { indexToCoordinate } from '.';
+import { indexToGridCoord } from '.';
 import { Index2D, Point2D, ShiftedGrid } from '../types';
-import { coordinateToIndex } from './IndexUtil';
+import { gridCoordToIndex } from './IndexUtil';
 import { cartToGrid, gridToCart } from './CartesianUtil';
 
 // TODO: add JSDoc
@@ -31,9 +31,9 @@ export const createShiftedGrid = (function () {
       itemSpacing,
       unitSize,
 
-      indexToGridCoord: indexToCoordinate,
+      indexToGridCoord,
 
-      gridCoordToIndex: coordinateToIndex,
+      gridCoordToIndex,
 
       gridCoordToScreenPoint: function (coord): Point2D {
         const { x: cx, y: cy } = gridToCart(coord);
