@@ -5,8 +5,16 @@ import { ReactiveGridItem } from './ReactiveGridItem';
 
 import 'tailwindcss/tailwind.css';
 import { createMagnificationEffect } from '../../../types/ItemStyleEffect';
-import { createShiftedGrid, ShiftedGrid, Point2D, cartToGrid, gridToCart } from '../../../libs';
+import {
+  createShiftedGrid,
+  ShiftedGrid,
+  Point2D,
+  cartToGrid,
+  gridToCart,
+  add2D,
+} from '../../../libs';
 import { getGridQuadrant } from '../../../libs/ShiftedGrid/utils/QuadrantUtil';
+import { useDragDisplacement } from '../../../hooks';
 
 interface ReactiveGridProps<T> {
   itemRadius: number;
@@ -25,7 +33,7 @@ interface ReactiveGridProps<T> {
  Because of the way we will use ReactiveGrid in this project, this method will work, albeit a bit more confusing and verbose should we need to match the exact functionality of React.FC in the future
  */
 
-const bgAlpha = 0.25;
+const bgAlpha = 0.5;
 const quadrantBGs = [
   `rgba(255,0,0,${bgAlpha})`,
   `rgba(255, 255, 0, ${bgAlpha})`,
@@ -39,15 +47,12 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   const { itemRadius, itemSpacing, magnification, effectRadius, items, renderItem } = props;
 
   /* HOOKS */
+  const dragDisplacement = useDragDisplacement();
 
   // state vars
   const [gridCenter, setGridCenter] = useState<Point2D>({ x: 0, y: 0 });
 
-  // when item spacing or item radius changes, we need to recreate the grid math functions
-  const grid: ShiftedGrid = useMemo(
-    () => createShiftedGrid(itemRadius, itemSpacing, gridCenter),
-    [itemRadius, itemSpacing, gridCenter],
-  );
+  // callbacks
 
   // when the grid changes size we need to update its center
   const handleResize = useCallback((info: ContentRect) => {
@@ -59,6 +64,15 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
       });
     }
   }, []);
+
+  // calculate scrollOffset
+  const scrollOffset: Point2D = useMemo(() => dragDisplacement, [dragDisplacement]);
+
+  // when item spacing or item radius changes, we need to recreate the grid math functions
+  const grid: ShiftedGrid = useMemo(
+    () => createShiftedGrid(itemRadius, itemSpacing, add2D(gridCenter, scrollOffset)),
+    [itemRadius, itemSpacing, gridCenter, scrollOffset],
+  );
 
   /* ItemStyleEffects */
   const effects = useMemo(() => {
@@ -72,34 +86,39 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   return (
     <Measure bounds onResize={handleResize}>
       {({ measureRef }) => (
-        <div ref={measureRef} className="w-full h-full">
-          {items.map((item, index) => {
-            const { x: gx, y: gy } = grid.indexToGridCoord(index);
-            const q = getGridQuadrant({ x: gx, y: gy });
-            const c = gridToCart({ x: gx, y: gy });
-            const g = cartToGrid(c);
-            const color = quadrantBGs[q];
-            return (
-              <ReactiveGridItem key={`item_${index}`} grid={grid} index={index} effects={effects}>
-                <div
-                  style={{
-                    backgroundColor: color,
-                    width: `${grid.unitSize.width - 5}px`,
-                    height: `${grid.unitSize.height - 5}px`,
-                    fontSize: 11,
-                  }}>
-                  {index}: ({gx}, {gy})<br />
-                  {grid.gridCoordToIndex({ x: gx, y: gy }, index)}
-                  <br />
-                  {JSON.stringify(c)}
-                  <br />
-                  {JSON.stringify(g)}
-                </div>
-                {/*<renderItem(item, index)*/}
-              </ReactiveGridItem>
-            );
-          })}
-        </div>
+        <>
+          <div className="w-24 h-24 bg-blue-400">
+            {`drag=${JSON.stringify(dragDisplacement)}`}
+          </div>
+          <div ref={measureRef} className="w-full h-full bg-gray-600">
+            {items.map((item, index) => {
+              const { x: gx, y: gy } = grid.indexToGridCoord(index);
+              const q = getGridQuadrant({ x: gx, y: gy });
+              const c = gridToCart({ x: gx, y: gy });
+              const g = cartToGrid(c);
+              const color = quadrantBGs[q];
+              return (
+                <ReactiveGridItem key={`item_${index}`} grid={grid} index={index} effects={effects}>
+                  <div
+                    style={{
+                      backgroundColor: color,
+                      width: `${grid.unitSize.width - 5}px`,
+                      height: `${grid.unitSize.height - 5}px`,
+                      fontSize: 11,
+                    }}>
+                    {index}: ({gx}, {gy})<br />
+                    {grid.gridCoordToIndex({ x: gx, y: gy }, index)}
+                    <br />
+                    {JSON.stringify(c)}
+                    <br />
+                    {JSON.stringify(g)}
+                  </div>
+                  {/*<renderItem(item, index)*/}
+                </ReactiveGridItem>
+              );
+            })}
+          </div>
+        </>
       )}
     </Measure>
   );
