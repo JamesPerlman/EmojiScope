@@ -17,10 +17,10 @@ export enum GridDirection {
 export const CartesianSlope: { [K in GridDirection]: number } = {
   [GridDirection.NX]: 0,
   [GridDirection.PX]: 0,
-  [GridDirection.NXNY]: -2,
-  [GridDirection.PXPY]: -2,
-  [GridDirection.PXNY]: 2,
-  [GridDirection.NXPY]: 2,
+  [GridDirection.NXNY]: 2,
+  [GridDirection.PXPY]: 2,
+  [GridDirection.PXNY]: -2,
+  [GridDirection.NXPY]: -2,
 };
 
 // This is a mapping of the Direction one must traverse from the origin to reach a specific RingCorner
