@@ -1,25 +1,17 @@
 import {
-  add2D,
-  DirectionFromCenterToCorner,
+  CornerDirectionForQuadrant,
   GridDirection,
+  GridQuadrant,
   Index2D,
-  Point2D,
-  RingCorner,
-  RingCornerIndices,
+  IntersectorDirectionForQuadrant,
+  origin2D,
 } from '../types';
 
-import {
-  areGridCoordsColinear,
-  getGridDistanceBetween,
-  isCoordBetween,
-  traverseGrid,
-  unreliableGridDistanceBetween,
-} from './ArithmeticUtil';
-import { isIndexEven } from './ArrayUtil';
+import { traverseGrid, unreliableGridDistanceBetween } from './ArithmeticUtil';
 import { cartToGrid } from './CartesianUtil';
-import { objectMin } from './CompareUtil';
 import { createGridRay } from './GridRayUtil';
 import { getLineIntersection } from './LineUtil';
+import { getGridQuadrant } from './QuadrantUtil';
 import {
   getFirstNodeIndexInRing,
   getLeadingRingCorner,
@@ -70,134 +62,61 @@ export const indexToCoordinate = (function () {
 
 // Another magical O(1) function which takes in a grid coordinate (Index2D) and outputs a 1D index following the spiral pattern.
 export const coordinateToIndex = (function () {
-  // Here we shall prepare some private scoped variables to help us with our calculations.
-  const origin: Index2D = { x: 0, y: 0 };
+  const cornerRay5Origin: Index2D = { x: 1, y: 0 };
+  return function (targetCoord: Index2D): number {
+    // We need to find which GridQuadrant the targetCoord is in
+    const targetQuadrant = getGridQuadrant(targetCoord);
 
-  // Let's create 6 GridRays that pass through all corners of all rings in our ShiftedGrid
-  const originRays = RingCornerIndices.slice(0, 5).map((corner) =>
-    createGridRay(origin, DirectionFromCenterToCorner[corner]),
-  );
+    // We also need to find the intersector direction for this quadrant
+    const intersectorDirection = IntersectorDirectionForQuadrant[targetQuadrant];
 
-  // The ray for corner 5 is special, because the ray that passes through these corners starts at (1, 0)
-  const corner5Ray = createGridRay({ x: 1, y: 0 }, DirectionFromCenterToCorner[5]);
+    // Let's create a GridRay that starts at targetCoord and goes in the direction of intersectorDirection
+    const targetIntersectorRay = createGridRay(targetCoord, intersectorDirection);
 
-  // Now we can create an array of GridRays that pass through every corner of every ring
-  const centerRays = [...originRays, corner5Ray];
+    // We need to get the direction of the leading corner for this quadrant
+    const leadingCornerDirection = CornerDirectionForQuadrant[targetQuadrant];
 
-  // Let's also get an array of 3 lines representing these 6 rays
-  // Remember that 2 rays would produce the same line because lines don't care about direction.
-  const centerLines = centerRays.filter(isIndexEven).map((gridRay) => gridRay.asCartLine());
+    // Define our cornerRay startCoord. Ray 5 has a special startCoord.
+    const cornerRayStartCoord = targetQuadrant === GridQuadrant.PXNY ? cornerRay5Origin : origin2D;
 
-  // We will need this highly-specialized function here later, and here alone
-  /* Once we find the intersection points between the center rays and the targetCoord rays,
-       We must find the 2 points which are:
-        1) colinear with each other
-        2) on either side of the input targetCoord
+    // Define a GridRay that starts at the cornerRayStartCoord and goes in the direction of the leading corner
+    const cornerRay = createGridRay(cornerRayStartCoord, leadingCornerDirection);
 
-      So that's what this function is for.
-    */
-  function getRelevantIntersectionCoords(
-    targetCoord: Index2D,
-    gridIntersections: Index2D[],
-  ): [Index2D, Index2D] {
-    for (const [i, a] of gridIntersections.entries()) {
-      for (const [j, b] of gridIntersections.entries()) {
-        // don't compare the same two gridIntersections
-        if (i !== j) {
-          if (areGridCoordsColinear(a, b) && areGridCoordsColinear(targetCoord, a) && areGridCoordsColinear(targetCoord, b) && isCoordBetween(targetCoord, a, b)) {
-            // ding ding ding!
-            return [a, b];
-          }
-        }
-      }
-    }
-    // This should never ever happen, but if we get to this point we will just return the origin for both points
-    // If this does happen, something is very, very wrong indeed.  Probably with the inputs
-    return [origin, origin];
-  }
-
-  /*
-    AND NOW, the moment we've all been waiting for...
-    Here's the actual function that returns the index given a targetCoord
-  */
-  return function (targetCoord: Index2D, referenceIndex: number): number {
-    // First let's test to see if our targetCoord is contained within any of the centerRays
-    centerRays.find((ray) => ray.contains(targetCoord));
-    for (const [i, ray] of centerRays.entries()) {
-      if (ray.contains(targetCoord)) {
-        // looks like targetCoord is a corner point! easy peasy.
-
-        // check out unreliableGridDistanceBetween to see why I named it that... It's reliable in this case, I promise!
-        const ringIndex = unreliableGridDistanceBetween(ray.startCoord, targetCoord);
-
-        return getRingCornerIndex(ringIndex, i as RingCorner);
-      }
-    }
-
-    // If we have made it to this point, we must call upon our good friend "added complexity" to figure out which index this gridCoord represents.
-
-    // Let's create 3 lines intersecting gridCoord
-    const targetLines = RingCornerIndices.filter(isIndexEven).map((corner) =>
-      createGridRay(targetCoord, DirectionFromCenterToCorner[corner]).asCartLine(),
+    // Now we need to find the intersection point between targetIntersectorRay and originToCornerRay
+    const intersectionPoint = getLineIntersection(
+      targetIntersectorRay.asCartLine(),
+      cornerRay.asCartLine(),
     );
 
-    // Now we must check for check for intersections between targetRays and centerRays
-    // There should always be six intersections in total
-    const gridIntersections: Index2D[] = [];
-    const cartIntersections: Point2D[] = [];
-    for (const [centerRayIndex, centerRay] of centerRays.entries()) {
-      for (const targetLine of targetLines) {
-        // Find the cartesian intersection of these lines
-        const cartIntersection = getLineIntersection(targetLine, centerRay.asCartLine());
-        if (cartIntersection !== undefined) {
-          // Now we need to convert this cartesian point back to ShiftedGrid space
-          const gridIntersection = cartToGrid(cartIntersection);
-          cartIntersections.push(cartIntersection);
-
-          // if centerRay does not contain gridInstersection, skip remaining calculations
-          if (!centerRay.contains(gridIntersection)) {
-            //continue;
-          }
-
-          // If the intersection point *should be* with centerRay[5] we need to adjust it by adding 1 to the x-component
-          // centerRay[5] is the part of centerLine[2] whose range is y > 0
-          if (centerRayIndex === 5) {
-            gridIntersection.x += 1;
-          }
-
-          // collect the intersection points in our array
-          gridIntersections.push(gridIntersection);
-        }
-      }
+    if (intersectionPoint === undefined) {
+      // this should never happen, if it does then something is extremely wrong
+      return 0;
     }
 
-    // Find the two ring corner coords that targetCoord is between
-    const [cornerCoordA, cornerCoordB] = getRelevantIntersectionCoords(
+    // Get intersectionPoint as grid coordinate
+    const leadingRingCornerCoord = cartToGrid(intersectionPoint);
+
+    // leadingRingConerCoord should always be on a ring corner.
+    // TODO: For direction PXNY we need to add 1 to the x-coordinate
+    // Get ring index of this targetCoord using the distance between center and leadingRingConerCoord
+    const targetRingIndex = unreliableGridDistanceBetween(
+      cornerRayStartCoord,
+      leadingRingCornerCoord,
+    );
+
+    // Get the RingCorner that leadingRingConerCoord represents
+    const leadingRingCorner = getRingCornerOfCornerCoord(leadingRingCornerCoord);
+
+    // Get the index of leadingRingCorner
+    const leadingRingCornerIndex = getRingCornerIndex(targetRingIndex, leadingRingCorner);
+
+    // Get distance between targetCoord and leadingRingCornerCoord
+    const distToLeadingRingCorner = unreliableGridDistanceBetween(
       targetCoord,
-      gridIntersections,
+      leadingRingCornerCoord,
     );
 
-    // Now we can get the ringIndex for either one of these cornerCoords
-    // Again we can use the unreliableGridDistance function since if something goes wrong it will just return 0
-    // But nothing should go wrong because these cornerCoords should definitely be ring corners.
-    const ringIndex = unreliableGridDistanceBetween(origin, cornerCoordA);
-
-    // We need to figure out which of these ringCorners has a lower RingCorner value
-    const ringCornerA = getRingCornerOfCornerCoord(cornerCoordA);
-    const ringCornerB = getRingCornerOfCornerCoord(cornerCoordB);
-    const leadingRingCorner = Math.min(ringCornerA, ringCornerB) as RingCorner;
-
-    // Determine its grid coordinates
-    const leadingCornerCoord = getRingCornerCoord(ringIndex, leadingRingCorner);
-
-    // And now, the grand finale...
-    // The index of targetCoord can be calculated by adding its grid-distance to the index of the RingCorner right before it!
-
-    // unreliableGridDistanceBetween is OK to use here since we have already verified that ringIndex and leadingRingCorner
-    const distanceToLeadingCorner = unreliableGridDistanceBetween(leadingCornerCoord, targetCoord);
-    const firstIndexInTargetRing = getFirstNodeIndexInRing(ringIndex);
-
-    const retVal = firstIndexInTargetRing + distanceToLeadingCorner;
-    return retVal;
+    // The result index should just be leadingRingCornerIndex + distToLeadingRingCorner!
+    return leadingRingCornerIndex + distToLeadingRingCorner;
   };
 })();
