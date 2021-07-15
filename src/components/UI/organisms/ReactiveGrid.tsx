@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import Measure, { ContentRect } from 'react-measure';
+import Measure, { BoundingRect, ContentRect } from 'react-measure';
 
 import { ReactiveGridItem } from './ReactiveGridItem';
 
@@ -9,11 +9,11 @@ import {
   createShiftedGrid,
   ShiftedGrid,
   Point2D,
-  cartToGrid,
-  gridToCart,
   add2D,
+  Index2D,
+  XYNumeric,
+  negate2D,
 } from '../../../libs';
-import { getGridQuadrant } from '../../../libs/ShiftedGrid/utils/QuadrantUtil';
 import { useDragDisplacement } from '../../../hooks';
 
 interface ReactiveGridProps<T> {
@@ -42,6 +42,14 @@ const quadrantBGs = [
   `rgba(0, 255, 0, ${bgAlpha})`,
   `rgba(0, 0, 255, ${bgAlpha})`,
 ];
+
+function getBoundingRectCenter(rect: BoundingRect): Point2D {
+  return {
+    x: 0.5 * (rect.left + rect.right),
+    y: 0.5 * (rect.top + rect.bottom),
+  };
+}
+
 const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElement = (props) => {
   // destructure props
   const { itemRadius, itemSpacing, magnification, effectRadius, items, renderItem } = props;
@@ -51,6 +59,14 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
 
   // state vars
   const [gridCenter, setGridCenter] = useState<Point2D>({ x: 0, y: 0 });
+  const [gridBounds, setGridBounds] = useState<BoundingRect>({
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 0,
+    height: 0,
+  });
 
   // callbacks
 
@@ -62,17 +78,43 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
         x: 0.5 * (bounds.left + bounds.right),
         y: 0.5 * (bounds.top + bounds.bottom),
       });
+      setGridBounds(bounds);
     }
   }, []);
 
-  // calculate scrollOffset
-  const scrollOffset: Point2D = useMemo(() => dragDisplacement, [dragDisplacement]);
 
   // when item spacing or item radius changes, we need to recreate the grid math functions
   const grid: ShiftedGrid = useMemo(
-    () => createShiftedGrid(itemRadius, itemSpacing, add2D(gridCenter, scrollOffset)),
-    [itemRadius, itemSpacing, gridCenter, scrollOffset],
+    () => createShiftedGrid(itemRadius, itemSpacing, gridCenter),
+    [itemRadius, itemSpacing, gridCenter],
   );
+
+  // calculate scrollOffset
+  const scrollOffset: Point2D = useMemo(() => dragDisplacement, [dragDisplacement]);
+  const gridOffset: Point2D = useMemo(() => {
+    return {
+      x: (scrollOffset.x - Math.floor(scrollOffset.x / grid.unitSize.width) * grid.unitSize.width),
+      y: (scrollOffset.y - Math.floor(scrollOffset.y / grid.unitSize.height) * grid.unitSize.height),
+    };
+  }, [grid, scrollOffset]);
+
+
+  /* GRID LAYOUT VARS */
+  const numberOfItemsPerAxis: XYNumeric = useMemo(
+    () => ({
+      x: Math.floor(gridBounds.width / grid.unitSize.width),
+      y: Math.floor(gridBounds.height / grid.unitSize.height),
+    }),
+    [grid, gridBounds],
+  );
+
+  const gridCoordsInWindow: Index2D[] = useMemo(() => {
+    //      const firstPointAtTopLeft = grid.screenPointToGridCoord({ x: gridBounds.left, y: gridBounds.top });
+    const centerCoord = grid.screenPointToGridCoord(
+      add2D(scrollOffset, getBoundingRectCenter(gridBounds)),
+    );
+    return [centerCoord];
+  }, [grid, gridBounds, scrollOffset]);
 
   /* ItemStyleEffects */
   const effects = useMemo(() => {
@@ -81,43 +123,44 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   }, [effectRadius, magnification]);
 
   /* DYNAMIC STYLES */
-
   /* RENDER */
   return (
     <Measure bounds onResize={handleResize}>
       {({ measureRef }) => (
         <>
-          <div className="w-24 h-24 bg-blue-400">
-            {`drag=${JSON.stringify(dragDisplacement)}`}
-          </div>
+          <div className="w-24 h-24 bg-blue-400">{`drag=${JSON.stringify(dragDisplacement)}`}</div>
+
           <div ref={measureRef} className="w-full h-full bg-gray-600">
-            {items.map((item, index) => {
-              const { x: gx, y: gy } = grid.indexToGridCoord(index);
-              const q = getGridQuadrant({ x: gx, y: gy });
-              const c = gridToCart({ x: gx, y: gy });
-              const g = cartToGrid(c);
-              const color = quadrantBGs[q];
+            {gridCoordsInWindow.map((gridCoord: Index2D, index: number) => {
               return (
-                <ReactiveGridItem key={`item_${index}`} grid={grid} index={index} effects={effects}>
+                <ReactiveGridItem
+                  key={`item_${index}`}
+                  grid={grid}
+                  index={index}
+                  effects={effects}
+                  gridOffset={gridOffset}>
                   <div
                     style={{
-                      backgroundColor: color,
+                      backgroundColor: '#FFFF00',
                       width: `${grid.unitSize.width - 5}px`,
                       height: `${grid.unitSize.height - 5}px`,
                       fontSize: 11,
                     }}>
-                    {index}: ({gx}, {gy})<br />
-                    {grid.gridCoordToIndex({ x: gx, y: gy }, index)}
-                    <br />
-                    {JSON.stringify(c)}
-                    <br />
-                    {JSON.stringify(g)}
+                    coord: ({index}: {JSON.stringify(gridCoord)}) itemIndex:{' '}
+                    {grid.gridCoordToIndex(gridCoord)}
                   </div>
-                  {/*<renderItem(item, index)*/}
+                  {/* renderItem(item, index) */}
                 </ReactiveGridItem>
               );
             })}
           </div>
+          <div
+            className="w-4 h-4 bg-black"
+            style={{
+              position: 'absolute',
+              left: gridCenter.x + scrollOffset.x,
+              top: gridCenter.y + scrollOffset.y,
+            }}></div>
         </>
       )}
     </Measure>
