@@ -25,15 +25,15 @@ interface ReactiveGridProps<T> {
  Because of the way we will use ReactiveGrid in this project, this method will work, albeit a bit more confusing and verbose should we need to match the exact functionality of React.FC in the future
  */
 
- const quadrantBGs = [
-   '#FF0000',
-   '#FFFF00',
-   '#FF00FF',
-   '#00FFFF',
-   '#00FF00',
-   '#0000FF',
-   '#AAAAAA',
- ]
+const bgAlpha = 0.25;
+const quadrantBGs = [
+  `rgba(255,0,0,${bgAlpha})`,
+  `rgba(255, 255, 0, ${bgAlpha})`,
+  `rgba(255, 0, 255, ${bgAlpha})`,
+  `rgba(0, 255, 255, ${bgAlpha})`,
+  `rgba(0, 255, 0, ${bgAlpha})`,
+  `rgba(0, 0, 255, ${bgAlpha})`,
+];
 const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElement = (props) => {
   // destructure props
   const { itemRadius, itemSpacing, magnification, effectRadius, items, renderItem } = props;
@@ -81,10 +81,18 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
             const color = quadrantBGs[q];
             return (
               <ReactiveGridItem key={`item_${index}`} grid={grid} index={index} effects={effects}>
-                <div style={{ backgroundColor: color, width: `${grid.unitSize.width - 5}px`, height: `${grid.unitSize.height - 5}px`, fontSize: 11 }}>
+                <div
+                  style={{
+                    backgroundColor: color,
+                    width: `${grid.unitSize.width - 5}px`,
+                    height: `${grid.unitSize.height - 5}px`,
+                    fontSize: 11,
+                  }}>
                   {index}: ({gx}, {gy})<br />
-                  {grid.gridCoordToIndex({ x: gx, y: gy }, index)}<br />
-                  {JSON.stringify(c)}<br />
+                  {grid.gridCoordToIndex({ x: gx, y: gy }, index)}
+                  <br />
+                  {JSON.stringify(c)}
+                  <br />
                   {JSON.stringify(g)}
                 </div>
                 {/*<renderItem(item, index)*/}
