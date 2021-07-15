@@ -76,7 +76,9 @@ export const useDragDisplacement = (function () {
     };
   }
 
-  // return the actual hook function
+  /*
+    RETURN THE ACTUAL HOOK FUNCTION HERE!
+  */
   return (): Point2D => {
     // setup some ref vars
     const isDragging = useRef<boolean>(false);
