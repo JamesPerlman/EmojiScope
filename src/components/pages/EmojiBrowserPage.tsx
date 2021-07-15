@@ -3,7 +3,6 @@ import { EmojiView, ReactiveGrid } from '../UI';
 
 import 'tailwindcss/tailwind.css';
 import { useSelectEmojis } from '../../store/emojiList/selectors';
-import { Emoji } from '../../models';
 
 type EmojiBrowserPageProps = {};
 
