@@ -1,14 +1,4 @@
-import { Index2D } from '../types';
-
-export enum GridQuadrant {
-  PXPY = 0,
-  PY = 1,
-  NXPY = 2,
-  NXNY = 3,
-  NY = 4,
-  PXNY = 5,
-  Unknown = 6,
-}
+import { GridQuadrant, Index2D } from '../types';
 
 export const getGridQuadrant = (function () {
   function d(t: number) {
@@ -32,7 +22,7 @@ export const getGridQuadrant = (function () {
       return GridQuadrant.NXNY;
     }
 
-    if (y < d(x + 1) && y < d(-x) - 1) {
+    if (y < d(x + 2) && y < d(1 - x) - 1) {
       return GridQuadrant.NY;
     }
 
