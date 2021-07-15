@@ -1,6 +1,6 @@
 export * from './2DTypes';
-export * from './CartRay';
 export * from './GridDirection';
+export * from './GridQuadrant';
 export * from './GridRay';
 export * from './RingCorner';
 export * from './ShiftedGrid';
