@@ -5,6 +5,7 @@ import { Index2D, Point2D, ShiftedGrid } from '../types';
 import { coordinateToIndex } from './IndexUtil';
 import { cartToGrid, gridToCart } from './CartesianUtil';
 
+// TODO: add JSDoc
 export const createShiftedGrid = (function () {
   const defaultStretchXY = { x: 1.0, y: GridConstants.yAxisCompression };
   const origin: Point2D = { x: 0, y: 0 };
