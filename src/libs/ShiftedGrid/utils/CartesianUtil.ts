@@ -8,34 +8,13 @@ It also includes convenient classes related to general cartesian geometry
 import { MathUtil } from '../../../utils';
 import { Index2D, Point2D } from '../types/2DTypes';
 
-const f_c2gOdd_x = (x: number): number => Math.round(x - 0.5) + 0.5;
-const f_c2gOdd_y = (y: number): number => Math.round(y);
-
-const f_c2gEven_x = (x: number): number => Math.round(x);
-const f_c2gEven_y = (y: number): number => Math.round(y);
-
-const f_c2gy = (x: number, y: number): number => {
-  if (MathUtil.modulo(Math.round(y), 2) === 1) {
-    return f_c2gOdd_y(y);
-  } else {
-    // if (MathUtil.modulo(Math.round(y), 2) === 0) {
-    return f_c2gEven_y(y);
-  }
-};
-
-const f_c2gx = (x: number, y: number): number => {
-  if (MathUtil.modulo(Math.round(y), 2) === 1) {
-    return f_c2gOdd_x(x);
-  } else {
-    // if (MathUtil.modulo(Math.round(y), 2) === 0) {
-    return f_c2gEven_x(x);
-  }
-};
 // Given a cartesian coordinate, find the nearest coordinate on the ShiftedGrid
 export function gridToCart({ x: cx, y: cy }: Index2D): Point2D {
+  const ry = Math.round(cy);
+  const k = 0.5 * MathUtil.modulo(ry, 2);
   return {
-    x: f_c2gx(cx, cy),
-    y: f_c2gy(cx, cy),
+    x: Math.round(cx - k) + k,
+    y: ry,
   };
 }
 
