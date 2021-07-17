@@ -206,42 +206,6 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
               );
             })}
           </div>
-          <div
-            className="w-4 h-4 bg-black"
-            style={{
-              position: 'absolute',
-              left: gridOffset.x,
-              top: gridOffset.y,
-            }}></div>
-          <div className="w-24 h-24 bg-blue-400 float-left text-sm align-text-bottom">
-            gridOffset
-            <br />
-            x: {gridOffset.x}
-            <br />
-            y: {gridOffset.y}
-          </div>
-          <div className="w-24 h-24 bg-green-400 float-left text-sm align-bottom">
-            drag
-            <br />
-            x: {dragDisplacement.x}
-            <br />
-            y: {dragDisplacement.y}
-          </div>
-          <div className="w-24 h-24 bg-green-400 float-left text-sm align-bottom">
-            wtf
-            <br />
-            x:
-            {MathUtil.modulo(Math.floor(scrollOffset.y / grid.unitSize.height), 2)}
-            <br />
-            y: {gridOffset.y}
-          </div>
-          <div
-            className="h-24 bg-green-700 float-left text-sm align-bottom"
-            style={{ width: '500px' }}>
-            doublewtf
-            <br />
-            {JSON.stringify(grid)}
-          </div>
         </>
       )}
     </Measure>
