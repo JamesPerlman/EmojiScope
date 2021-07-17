@@ -102,10 +102,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   const handleResize = useCallback((info: ContentRect) => {
     const { bounds } = info;
     if (bounds !== undefined) {
-      setGridCenter({
-        x: 0.5 * (bounds.left + bounds.right),
-        y: 0.5 * (bounds.top + bounds.bottom),
-      });
+      setGridCenter(getBoundingRectCenter(bounds));
       setGridBounds(bounds);
     }
   }, []);
