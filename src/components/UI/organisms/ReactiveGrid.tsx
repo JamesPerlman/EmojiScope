@@ -145,22 +145,28 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   );
   */
 
-  const cartOffset: Point2D = { x: 0, y: 0 };
-
-  const gridCoordsInWindow: Index2D[] = useMemo(() => {
+  const gridCoordsInWindowedScrollArea: Index2D[] = useMemo(() => {
+    // Define some useful constants
     const scaledWindowedBounds = getNormalizedBoundingRect(windowedBounds, grid.unitSize);
     const ceilOfWidth = Math.ceil(scaledWindowedBounds.width);
     const ceilOfHeight = Math.ceil(scaledWindowedBounds.height);
+    const ceilOfWidthPlusOne = ceilOfWidth + 1;
+    const ceilOfHeightPlusOne = ceilOfHeight + 1;
 
+    // Use a double-nested loop to collect the gridCoords we need to show inside this windowed scroll area
     const gridCoords: Index2D[] = [];
 
-    for (let x = 0; x < ceilOfWidth; ++x) {
-      for (let y = 0; y < ceilOfHeight; ++y) {
+    for (let x = -1; x < ceilOfWidthPlusOne; ++x) {
+      for (let y = -1; y < ceilOfHeightPlusOne; ++y) {
+        // Get the cartesian point of this (x, y) coord inside the windowed scroll area
         const cartPoint = {
           x: x - 0.5 * ceilOfWidth - scaledScrollOffset.x,
           y: y - 0.5 * ceilOfHeight - scaledScrollOffset.y,
         };
+        // Convert the cartPoint to a gridPoint
         const gridCoord = cartToGrid(cartPoint);
+
+        // Add it to our gridCoords array
         gridCoords.push(gridCoord);
       }
     }
@@ -180,7 +186,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
       {({ measureRef }) => (
         <>
           <div ref={measureRef} className="w-full h-full bg-gray-600">
-            {gridCoordsInWindow.map((gridCoord: Index2D) => {
+            {gridCoordsInWindowedScrollArea.map((gridCoord: Index2D) => {
               const k = cartToGrid(normalizedScrollOffset);
               const index = gridCoordToIndex(gridCoord);
               return (
@@ -192,13 +198,13 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
                   gridOffset={scrollOffset}>
                   <div
                     style={{
-                      backgroundColor:
-                        gridCoord.x === 0 && gridCoord.y === 0 ? '#FF00FF' : '#FFFF00',
+                      backgroundColor: quadrantBGs[getGridQuadrant(gridCoord)],
                       width: `${grid.unitSize.width - 5}px`,
                       height: `${grid.unitSize.height - 5}px`,
                       fontSize: 11,
                     }}>
-                    index: {index}
+                    index: {index} <br />
+                    coord: (x: {gridCoord.x}, y: {gridCoord.y})
                     <br />
                   </div>
                   {/* renderItem(item, index) */}
