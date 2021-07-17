@@ -19,6 +19,7 @@ import {
 import { useDragDisplacement } from '../../../hooks';
 import { getGridQuadrant } from '../../../libs/ShiftedGrid/utils/QuadrantUtil';
 import { MousePositionContextProvider } from '../../../contexts';
+import { useSelectEmojis } from '../../../store/emojiList/selectors';
 
 interface ReactiveGridProps<T> {
   itemRadius: number;
@@ -80,6 +81,8 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
 
   /* HOOKS */
   const dragDisplacement = useDragDisplacement();
+
+  const emojis = useSelectEmojis();
 
   // state vars
   const [gridCenter, setGridCenter] = useState<Point2D>({ x: 0, y: 0 });
@@ -199,16 +202,15 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
                     gridOffset={scrollOffset}>
                     <div
                       style={{
-                        backgroundColor: quadrantBGs[getGridQuadrant(gridCoord)],
                         width: `${grid.unitSize.width - 5}px`,
                         height: `${grid.unitSize.height - 5}px`,
-                        fontSize: 11,
+                        fontSize: Math.min(grid.unitSize.width, grid.unitSize.height) - 10,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                       }}>
-                      index: {index} <br />
-                      coord: (x: {gridCoord.x}, y: {gridCoord.y})
-                      <br />
+                      {emojis[index]?.character}
                     </div>
-                    {/* renderItem(item, index) */}
                   </ReactiveGridItem>
                 );
               })}
