@@ -1,21 +1,29 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Point2D } from '../libs';
+import React, { useState, useEffect } from 'react';
+import { origin2D, Point2D } from '../libs';
 
-export const useMousePosition = (): Point2D | undefined => {
-  const [coords, setCoords] = useState<Point2D | undefined>();
+export const useMousePosition = (function () {
+  function createMouseMoveEventListener(
+    setCoords: React.Dispatch<React.SetStateAction<Point2D>>,
+  ): (event: MouseEvent) => void {
+    return function (event: MouseEvent) {
+      setCoords({
+        x: event.clientX,
+        y: event.clientY,
+      });
+    };
+  }
 
-  const mouseMoveEventListener = useCallback((event: MouseEvent) => {
-    setCoords({
-      x: event.clientX,
-      y: event.clientY,
-    });
-  }, []);
+  return function (): Point2D {
+    const [coords, setCoords] = useState<Point2D>(origin2D);
 
-  useEffect(() => {
-    window.addEventListener('mousemove', mouseMoveEventListener);
+    useEffect(() => {
+      const mouseMoveEventListener = createMouseMoveEventListener(setCoords);
 
-    return () => window.removeEventListener('mousemove', mouseMoveEventListener);
-  });
+      window.addEventListener('mousemove', mouseMoveEventListener);
 
-  return coords;
-};
+      return () => window.removeEventListener('mousemove', mouseMoveEventListener);
+    }, []);
+
+    return coords;
+  };
+})();
