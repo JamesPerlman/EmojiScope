@@ -76,7 +76,7 @@ function getNormalizedBoundingRect(rect: BoundingRect, gridSize: Size2D): Boundi
 
 const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElement = (props) => {
   // destructure props
-  const { itemRadius, itemSpacing, magnification, effectRadius, items, renderItem } = props;
+  const { itemRadius, itemSpacing, magnification, effectRadius } = props;
 
   /* HOOKS */
   const dragDisplacement = useDragDisplacement();
@@ -189,7 +189,6 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
           <>
             <div ref={measureRef} className="w-full h-full bg-gray-600">
               {gridCoordsInWindowedScrollArea.map((gridCoord: Index2D) => {
-                const k = cartToGrid(normalizedScrollOffset);
                 const index = gridCoordToIndex(gridCoord);
                 return (
                   <ReactiveGridItem
