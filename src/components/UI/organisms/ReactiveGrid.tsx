@@ -120,10 +120,13 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
     [grid.unitSize, scrollOffset],
   );
 
-  const normalizedScrollOffset: Point2D = useMemo(() => ({
-    x: Math.floor(scrollOffset.x / grid.unitSize.width),
-    y: Math.floor(scrollOffset.y / grid.unitSize.height),
-  }), [scrollOffset, grid]);
+  const normalizedScrollOffset: Point2D = useMemo(
+    () => ({
+      x: Math.floor(scrollOffset.x / grid.unitSize.width),
+      y: Math.floor(scrollOffset.y / grid.unitSize.height),
+    }),
+    [scrollOffset, grid],
+  );
 
   const gridOffset: Point2D = useMemo(() => {
     const xOffset = 0.5 * MathUtil.modulo(normalizedScrollOffset.y, 2);
