@@ -123,6 +123,8 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
     [scrollOffset, grid],
   );
 
+  /*
+  // Not sure why this is still here
   const gridOffset: Point2D = useMemo(() => {
     const xOffset = 0.5 * MathUtil.modulo(normalizedScrollOffset.y, 2);
     return {
@@ -130,8 +132,10 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
       y: scrollOffset.y - grid.unitSize.height * Math.floor(normalizedScrollOffset.y),
     };
   }, [grid.unitSize, scrollOffset, normalizedScrollOffset]);
-
+  */
   /* GRID LAYOUT VARS */
+  /*
+  also gonna be honest, don't remember why this is here
   const numberOfItemsPerAxis: XYNumeric = useMemo(
     () => ({
       x: Math.floor(windowedBounds.width / grid.unitSize.width),
@@ -139,6 +143,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
     }),
     [grid, windowedBounds],
   );
+  */
 
   const cartOffset: Point2D = { x: 0, y: 0 };
 
