@@ -6,7 +6,7 @@ export type MousePositionContextValueType = {
   mousePosition: Point2D;
 };
 
-const MousePositionContext = React.createContext<MousePositionContextValueType>({
+export const MousePositionContext = React.createContext<MousePositionContextValueType>({
   mousePosition: origin2D,
 });
 
