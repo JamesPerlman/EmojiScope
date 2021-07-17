@@ -14,7 +14,7 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
   const { children, grid, index, effects, gridOffset } = props;
 
   // TODO: a way of turning on & off effects
-  // previous method was to turn them off if useMousePosition() returned undefined
+  // Grabbing mousePosition from a context is SO MUCH FASTER than using useMousePosition here!
   const mousePosition = useMousePositionContext().mousePosition;
 
   const itemPosition = useMemo(
