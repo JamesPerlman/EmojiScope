@@ -18,6 +18,7 @@ import {
 } from '../../../libs';
 import { useDragDisplacement } from '../../../hooks';
 import { getGridQuadrant } from '../../../libs/ShiftedGrid/utils/QuadrantUtil';
+import { MousePositionContextProvider } from '../../../contexts';
 
 interface ReactiveGridProps<T> {
   itemRadius: number;
@@ -182,39 +183,41 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   /* DYNAMIC STYLES */
   /* RENDER */
   return (
-    <Measure bounds onResize={handleResize}>
-      {({ measureRef }) => (
-        <>
-          <div ref={measureRef} className="w-full h-full bg-gray-600">
-            {gridCoordsInWindowedScrollArea.map((gridCoord: Index2D) => {
-              const k = cartToGrid(normalizedScrollOffset);
-              const index = gridCoordToIndex(gridCoord);
-              return (
-                <ReactiveGridItem
-                  key={`item_${index}`}
-                  grid={grid}
-                  index={index}
-                  effects={effects}
-                  gridOffset={scrollOffset}>
-                  <div
-                    style={{
-                      backgroundColor: quadrantBGs[getGridQuadrant(gridCoord)],
-                      width: `${grid.unitSize.width - 5}px`,
-                      height: `${grid.unitSize.height - 5}px`,
-                      fontSize: 11,
-                    }}>
-                    index: {index} <br />
-                    coord: (x: {gridCoord.x}, y: {gridCoord.y})
-                    <br />
-                  </div>
-                  {/* renderItem(item, index) */}
-                </ReactiveGridItem>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </Measure>
+    <MousePositionContextProvider>
+      <Measure bounds onResize={handleResize}>
+        {({ measureRef }) => (
+          <>
+            <div ref={measureRef} className="w-full h-full bg-gray-600">
+              {gridCoordsInWindowedScrollArea.map((gridCoord: Index2D) => {
+                const k = cartToGrid(normalizedScrollOffset);
+                const index = gridCoordToIndex(gridCoord);
+                return (
+                  <ReactiveGridItem
+                    key={`item_${index}`}
+                    grid={grid}
+                    index={index}
+                    effects={effects}
+                    gridOffset={scrollOffset}>
+                    <div
+                      style={{
+                        backgroundColor: quadrantBGs[getGridQuadrant(gridCoord)],
+                        width: `${grid.unitSize.width - 5}px`,
+                        height: `${grid.unitSize.height - 5}px`,
+                        fontSize: 11,
+                      }}>
+                      index: {index} <br />
+                      coord: (x: {gridCoord.x}, y: {gridCoord.y})
+                      <br />
+                    </div>
+                    {/* renderItem(item, index) */}
+                  </ReactiveGridItem>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </Measure>
+    </MousePositionContextProvider>
   );
 };
 
