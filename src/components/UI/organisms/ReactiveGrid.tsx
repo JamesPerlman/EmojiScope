@@ -13,8 +13,16 @@ import {
   Index2D,
   XYNumeric,
   negate2D,
+  Scale2D,
+  Size2D,
+  cartToGrid,
+  normalize2D,
+  subtract2D,
+  indexToGridCoord,
+  gridCoordToIndex,
 } from '../../../libs';
 import { useDragDisplacement } from '../../../hooks';
+import { MathUtil } from '../../../utils';
 
 interface ReactiveGridProps<T> {
   itemRadius: number;
@@ -50,6 +58,26 @@ function getBoundingRectCenter(rect: BoundingRect): Point2D {
   };
 }
 
+function getScaledBoundingRect(rect: BoundingRect, scale: Scale2D): BoundingRect {
+  const center = getBoundingRectCenter(rect);
+  return {
+    width: scale.x * rect.width,
+    height: scale.y * rect.height,
+    top: scale.y * (rect.top - center.y),
+    left: scale.x * (rect.left - center.x),
+    bottom: scale.y * (rect.bottom - center.y),
+    right: scale.x * (rect.right - center.x),
+  };
+}
+
+function getNormalizedBoundingRect(rect: BoundingRect, gridSize: Size2D): BoundingRect {
+  const inverseScale: Scale2D = {
+    x: 1 / gridSize.width,
+    y: 1 / gridSize.height,
+  };
+  return getScaledBoundingRect(rect, inverseScale);
+}
+
 const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElement = (props) => {
   // destructure props
   const { itemRadius, itemSpacing, magnification, effectRadius, items, renderItem } = props;
@@ -59,7 +87,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
 
   // state vars
   const [gridCenter, setGridCenter] = useState<Point2D>({ x: 0, y: 0 });
-  const [gridBounds, setGridBounds] = useState<BoundingRect>({
+  const [windowedBounds, setGridBounds] = useState<BoundingRect>({
     left: 0,
     right: 0,
     top: 0,
@@ -82,7 +110,6 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
     }
   }, []);
 
-
   // when item spacing or item radius changes, we need to recreate the grid math functions
   const grid: ShiftedGrid = useMemo(
     () => createShiftedGrid(itemRadius, itemSpacing, gridCenter),
@@ -91,30 +118,54 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
 
   // calculate scrollOffset
   const scrollOffset: Point2D = useMemo(() => dragDisplacement, [dragDisplacement]);
-  const gridOffset: Point2D = useMemo(() => {
-    return {
-      x: (scrollOffset.x - Math.floor(scrollOffset.x / grid.unitSize.width) * grid.unitSize.width),
-      y: (scrollOffset.y - Math.floor(scrollOffset.y / grid.unitSize.height) * grid.unitSize.height),
-    };
-  }, [grid, scrollOffset]);
+  const scaledScrollOffset = useMemo(
+    () => normalize2D(scrollOffset, grid.unitSize),
+    [grid.unitSize, scrollOffset],
+  );
 
+  const normalizedScrollOffset: Point2D = useMemo(() => ({
+    x: Math.floor(scrollOffset.x / grid.unitSize.width),
+    y: Math.floor(scrollOffset.y / grid.unitSize.height),
+  }), [scrollOffset, grid]);
+
+  const gridOffset: Point2D = useMemo(() => {
+    const xOffset = 0.5 * MathUtil.modulo(normalizedScrollOffset.y, 2);
+    return {
+      x: scrollOffset.x - grid.unitSize.width * (Math.floor(normalizedScrollOffset.x) + xOffset),
+      y: scrollOffset.y - grid.unitSize.height * Math.floor(normalizedScrollOffset.y),
+    };
+  }, [grid.unitSize, scrollOffset, normalizedScrollOffset]);
 
   /* GRID LAYOUT VARS */
   const numberOfItemsPerAxis: XYNumeric = useMemo(
     () => ({
-      x: Math.floor(gridBounds.width / grid.unitSize.width),
-      y: Math.floor(gridBounds.height / grid.unitSize.height),
+      x: Math.floor(windowedBounds.width / grid.unitSize.width),
+      y: Math.floor(windowedBounds.height / grid.unitSize.height),
     }),
-    [grid, gridBounds],
+    [grid, windowedBounds],
   );
 
+  const cartOffset: Point2D = { x: 0, y: 0 };
+
   const gridCoordsInWindow: Index2D[] = useMemo(() => {
-    //      const firstPointAtTopLeft = grid.screenPointToGridCoord({ x: gridBounds.left, y: gridBounds.top });
-    const centerCoord = grid.screenPointToGridCoord(
-      add2D(scrollOffset, getBoundingRectCenter(gridBounds)),
-    );
-    return [centerCoord];
-  }, [grid, gridBounds, scrollOffset]);
+    const scaledWindowedBounds = getNormalizedBoundingRect(windowedBounds, grid.unitSize);
+    const ceilOfWidth = Math.ceil(scaledWindowedBounds.width);
+    const ceilOfHeight = Math.ceil(scaledWindowedBounds.height);
+
+    const gridCoords: Index2D[] = [];
+
+    for (let x = 0; x < ceilOfWidth; ++x) {
+      for (let y = 0; y < ceilOfHeight; ++y) {
+        const cartPoint = {
+          x: x - 0.5 * ceilOfWidth - scaledScrollOffset.x,
+          y: y - 0.5 * ceilOfHeight - scaledScrollOffset.y,
+        };
+        const gridCoord = cartToGrid(cartPoint);
+        gridCoords.push(gridCoord);
+      }
+    }
+    return gridCoords;
+  }, [grid, windowedBounds, scrollOffset]);
 
   /* ItemStyleEffects */
   const effects = useMemo(() => {
@@ -128,26 +179,27 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
     <Measure bounds onResize={handleResize}>
       {({ measureRef }) => (
         <>
-          <div className="w-24 h-24 bg-blue-400">{`drag=${JSON.stringify(dragDisplacement)}`}</div>
-
           <div ref={measureRef} className="w-full h-full bg-gray-600">
-            {gridCoordsInWindow.map((gridCoord: Index2D, index: number) => {
+            {gridCoordsInWindow.map((gridCoord: Index2D) => {
+              const k = cartToGrid(normalizedScrollOffset);
+              const index = gridCoordToIndex(gridCoord);
               return (
                 <ReactiveGridItem
                   key={`item_${index}`}
                   grid={grid}
                   index={index}
                   effects={effects}
-                  gridOffset={gridOffset}>
+                  gridOffset={scrollOffset}>
                   <div
                     style={{
-                      backgroundColor: '#FFFF00',
+                      backgroundColor:
+                        gridCoord.x === 0 && gridCoord.y === 0 ? '#FF00FF' : '#FFFF00',
                       width: `${grid.unitSize.width - 5}px`,
                       height: `${grid.unitSize.height - 5}px`,
                       fontSize: 11,
                     }}>
-                    coord: ({index}: {JSON.stringify(gridCoord)}) itemIndex:{' '}
-                    {grid.gridCoordToIndex(gridCoord)}
+                    index: {index}
+                    <br />
                   </div>
                   {/* renderItem(item, index) */}
                 </ReactiveGridItem>
@@ -158,9 +210,38 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
             className="w-4 h-4 bg-black"
             style={{
               position: 'absolute',
-              left: gridCenter.x + scrollOffset.x,
-              top: gridCenter.y + scrollOffset.y,
+              left: gridOffset.x,
+              top: gridOffset.y,
             }}></div>
+          <div className="w-24 h-24 bg-blue-400 float-left text-sm align-text-bottom">
+            gridOffset
+            <br />
+            x: {gridOffset.x}
+            <br />
+            y: {gridOffset.y}
+          </div>
+          <div className="w-24 h-24 bg-green-400 float-left text-sm align-bottom">
+            drag
+            <br />
+            x: {dragDisplacement.x}
+            <br />
+            y: {dragDisplacement.y}
+          </div>
+          <div className="w-24 h-24 bg-green-400 float-left text-sm align-bottom">
+            wtf
+            <br />
+            x:
+            {MathUtil.modulo(Math.floor(scrollOffset.y / grid.unitSize.height), 2)}
+            <br />
+            y: {gridOffset.y}
+          </div>
+          <div
+            className="h-24 bg-green-700 float-left text-sm align-bottom"
+            style={{ width: '500px' }}>
+            doublewtf
+            <br />
+            {JSON.stringify(grid)}
+          </div>
         </>
       )}
     </Measure>

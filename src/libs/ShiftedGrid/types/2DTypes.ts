@@ -35,9 +35,18 @@ export function subtract2D<T extends XYNumeric>(a: T, b: T): T {
 }
 
 // returns { -x, -y } for a given XYNumeric
-export function negate2D<T extends XYNumeric>(p: T): T {
+export function negate2D<T extends XYNumeric>(a: T): T {
   return {
-    x: -p.x,
-    y: -p.y,
+    x: -a.x,
+    y: -a.y,
+  } as T;
+}
+
+// Normalizes a given XYNumeric by a Size2D
+
+export function normalize2D<T extends XYNumeric>(a: T, s: Size2D): T {
+  return {
+    x: a.x / s.width,
+    y: a.y / s.height,
   } as T;
 }
