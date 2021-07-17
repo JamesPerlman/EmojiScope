@@ -9,20 +9,15 @@ import {
   createShiftedGrid,
   ShiftedGrid,
   Point2D,
-  add2D,
   Index2D,
-  XYNumeric,
-  negate2D,
   Scale2D,
   Size2D,
   cartToGrid,
   normalize2D,
-  subtract2D,
-  indexToGridCoord,
   gridCoordToIndex,
 } from '../../../libs';
 import { useDragDisplacement } from '../../../hooks';
-import { MathUtil } from '../../../utils';
+import { getGridQuadrant } from '../../../libs/ShiftedGrid/utils/QuadrantUtil';
 
 interface ReactiveGridProps<T> {
   itemRadius: number;
