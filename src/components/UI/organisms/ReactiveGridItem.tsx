@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useMousePosition } from '../../../hooks';
+import { useMousePositionContext } from '../../../hooks';
 import { add2D, Point2D, ShiftedGrid } from '../../../libs';
 import { ItemStyleEffect } from '../../../types';
 
@@ -15,7 +15,7 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
 
   // TODO: a way of turning on & off effects
   // previous method was to turn them off if useMousePosition() returned undefined
-  const mousePosition = /*useMousePosition() ?? */ { x: 0, y: 0 };
+  const mousePosition = useMousePositionContext().mousePosition;
 
   const itemPosition = useMemo(
     () => add2D(gridOffset, grid.gridCoordToScreenPoint(grid.indexToGridCoord(index))),
