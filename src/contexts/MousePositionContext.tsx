@@ -12,7 +12,9 @@ export const MousePositionContext = React.createContext<MousePositionContextValu
 
 export type MousePositionContextProviderProps = React.PropsWithChildren<{}>;
 
-export const MousePositionContextProvider: React.FC<MousePositionContextProviderProps> = (props) => {
+export const MousePositionContextProvider: React.FC<MousePositionContextProviderProps> = (
+  props,
+) => {
   const { children } = props;
 
   const mousePosition = useMousePosition();
