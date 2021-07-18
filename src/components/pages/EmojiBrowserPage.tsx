@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
+import Measure, { ContentRect } from 'react-measure';
 import 'tailwindcss/tailwind.css';
+import { Size2D } from '../../libs';
 import { useSelectEmojis } from '../../store/emojiList/selectors';
 import { EmojiView, ReactiveGrid } from '../UI';
 
@@ -7,19 +9,53 @@ type EmojiBrowserPageProps = {};
 
 const EmojiBrowserPageElement: React.FC<EmojiBrowserPageProps> = (props) => {
   const emojis = useSelectEmojis();
+
+  const [gridSize, setGridSize] = useState<Size2D>({ width: 0, height: 0 });
+
+  const handleResize = useCallback((info: ContentRect) => {
+    if (info?.bounds === undefined) {
+      return;
+    }
+
+    const sideLength = 0.5 * Math.min(info.bounds.width, info.bounds.height);
+    setGridSize({
+      width: sideLength,
+      height: sideLength,
+    });
+  }, []);
+
   return (
-    <div className="w-full h-full p-4">
-      <ReactiveGrid
-        magnification={1.0}
-        effectRadius={200}
-        itemRadius={40}
-        itemSpacing={20}
-        items={emojis}
-        renderItem={(item, index, itemSize) => (
-          <EmojiView char={item?.character} itemSize={itemSize} />
-        )}
-      />
-    </div>
+    <Measure bounds onResize={handleResize}>
+      {({ measureRef }) => (
+        <div
+          ref={measureRef}
+          className="w-full h-full"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          >
+          <div
+            className="p-4"
+            style={{
+              width: gridSize.width,
+              height: gridSize.height,
+            }}>
+            <ReactiveGrid
+              magnification={0}
+              effectRadius={200}
+              itemRadius={30}
+              itemSpacing={20}
+              items={emojis}
+              renderItem={(item, index, itemSize) => (
+                <EmojiView char={item?.character} itemSize={itemSize} />
+              )}
+            />
+          </div>
+        </div>
+      )}
+    </Measure>
   );
 };
 
