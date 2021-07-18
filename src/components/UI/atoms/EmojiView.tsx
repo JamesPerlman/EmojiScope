@@ -1,22 +1,25 @@
 import React from 'react';
 import 'tailwindcss/tailwind.css';
+import { Size2D } from '../../../libs';
 
 interface EmojiViewProps {
   char: string;
   style?: React.CSSProperties;
+  itemSize: Size2D;
 }
 
 const EmojiViewElement: React.FC<EmojiViewProps> = (props) => {
-  const { char, style } = props;
+  const { char, itemSize, style } = props;
   return (
     <div
-      className="bg-white rounded-full"
       style={{
-        width: '100%',
-        height: '100%',
-        ...style,
-      }}
-    >
+        width: `${itemSize.width - 5}px`,
+        height: `${itemSize.height - 5}px`,
+        fontSize: Math.min(itemSize.width, itemSize.height) - 10,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
       {char}
     </div>
   );

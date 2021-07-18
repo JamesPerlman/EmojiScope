@@ -7,17 +7,17 @@ import { useSelectEmojis } from '../../store/emojiList/selectors';
 type EmojiBrowserPageProps = {};
 
 const EmojiBrowserPageElement: React.FC<EmojiBrowserPageProps> = (props) => {
-  const emojis = useSelectEmojis().slice(0, 100);
+  const emojis = useSelectEmojis();
   return (
     <div className="w-full h-full p-4">
       <ReactiveGrid
-        magnification={0}
+        magnification={1.0}
         effectRadius={200}
         itemRadius={40}
         itemSpacing={20}
         items={emojis}
-        renderItem={(item, number) => (
-          <EmojiView char={item.character} />
+        renderItem={(item, index, itemSize) => (
+          <EmojiView char={item?.character} itemSize={itemSize} />
         )}
       />
     </div>

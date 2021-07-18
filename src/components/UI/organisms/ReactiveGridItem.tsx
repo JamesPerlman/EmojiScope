@@ -41,6 +41,7 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
     <div
       style={{
         position: 'absolute',
+        overflow: 'visible',
         width: grid.unitSize.width,
         height: grid.unitSize.height,
         ...reactiveStyles,

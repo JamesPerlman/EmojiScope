@@ -17,7 +17,6 @@ import {
   gridCoordToIndex,
 } from '../../../libs';
 import { useDragDisplacement } from '../../../hooks';
-import { getGridQuadrant } from '../../../libs/ShiftedGrid/utils/QuadrantUtil';
 import { MousePositionContextProvider } from '../../../contexts';
 import { useSelectEmojis } from '../../../store/emojiList/selectors';
 
@@ -27,26 +26,16 @@ interface ReactiveGridProps<T> {
   magnification: number;
   effectRadius: number;
   items: T[];
-  renderItem: (item: T, index: number) => React.ReactElement | null;
+  renderItem: (item: T, index: number, size: Size2D) => React.ReactElement | string | null;
 }
 
-/*
+/*.
  I would love to make ReactiveGridElement a React.FC, however since there are generic types associated with ReactiveGridProps we cannot do this.
  There are some good resources here for why this needs to be done this way https://wanago.io/2020/03/09/functional-react-components-with-generic-props-in-typescript/
  It's just a limitation of typescript.  Here's another good resource: https://stackoverflow.com/questions/53958028/how-to-use-generics-in-props-in-react-in-a-functional-component
 
  Because of the way we will use ReactiveGrid in this project, this method will work, albeit a bit more confusing and verbose should we need to match the exact functionality of React.FC in the future
  */
-
-const bgAlpha = 0.5;
-const quadrantBGs = [
-  `rgba(255,0,0,${bgAlpha})`,
-  `rgba(255, 255, 0, ${bgAlpha})`,
-  `rgba(255, 0, 255, ${bgAlpha})`,
-  `rgba(0, 255, 255, ${bgAlpha})`,
-  `rgba(0, 255, 0, ${bgAlpha})`,
-  `rgba(0, 0, 255, ${bgAlpha})`,
-];
 
 function getBoundingRectCenter(rect: BoundingRect): Point2D {
   return {
@@ -77,11 +66,10 @@ function getNormalizedBoundingRect(rect: BoundingRect, gridSize: Size2D): Boundi
 
 const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElement = (props) => {
   // destructure props
-  const { itemRadius, itemSpacing, magnification, effectRadius } = props;
+  const { itemRadius, itemSpacing, magnification, effectRadius, items, renderItem } = props;
 
   /* HOOKS */
   const dragDisplacement = useDragDisplacement();
-
   const emojis = useSelectEmojis();
 
   // state vars
@@ -193,6 +181,8 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
             <div ref={measureRef} className="w-full h-full bg-gray-600">
               {gridCoordsInWindowedScrollArea.map((gridCoord: Index2D) => {
                 const index = gridCoordToIndex(gridCoord);
+                const item = items[index];
+
                 return (
                   <ReactiveGridItem
                     key={`item_${index}`}
@@ -200,17 +190,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
                     index={index}
                     effects={effects}
                     gridOffset={scrollOffset}>
-                    <div
-                      style={{
-                        width: `${grid.unitSize.width - 5}px`,
-                        height: `${grid.unitSize.height - 5}px`,
-                        fontSize: Math.min(grid.unitSize.width, grid.unitSize.height) - 10,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                      {emojis[index]?.character}
-                    </div>
+                    {renderItem(item, index, grid.unitSize)}
                   </ReactiveGridItem>
                 );
               })}
