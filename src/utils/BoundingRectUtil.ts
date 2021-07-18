@@ -29,9 +29,19 @@ export const BoundingRectUtil = (function () {
     return getScaled(rect, inverseScale);
   }
 
+  const emptyBoundingRect: BoundingRect = {
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 0,
+    height: 0,
+  };
+
   return {
     getCenter,
     getScaled,
     getNormalized,
+    emptyBoundingRect,
   };
 })(); // End anonymous function for BoundingRectUtil

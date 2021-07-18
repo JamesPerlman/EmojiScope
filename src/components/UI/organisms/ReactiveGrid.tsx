@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Measure, { BoundingRect, ContentRect } from 'react-measure';
 import 'tailwindcss/tailwind.css';
 import { MousePositionContextProvider } from '../../../contexts';
@@ -32,7 +32,6 @@ interface ReactiveGridProps<T> {
 
  Because of the way we will use ReactiveGrid in this project, this method will work, albeit a bit more confusing and verbose should we need to match the exact functionality of React.FC in the future
  */
-
 const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElement = (props) => {
   // destructure props
   const { itemRadius, itemSpacing, magnification, effectRadius, items, renderItem } = props;
@@ -42,14 +41,9 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
 
   // state vars
   const [gridCenter, setGridCenter] = useState<Point2D>({ x: 0, y: 0 });
-  const [windowedBounds, setGridBounds] = useState<BoundingRect>({
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    width: 0,
-    height: 0,
-  });
+  const [windowedBounds, setGridBounds] = useState<BoundingRect>(
+    BoundingRectUtil.emptyBoundingRect,
+  );
 
   // callbacks
 
@@ -110,7 +104,6 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
     return [magnify];
   }, [effectRadius, magnification]);
 
-  /* DYNAMIC STYLES */
   /* RENDER */
   return (
     <MousePositionContextProvider>
@@ -129,7 +122,10 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
                     index={index}
                     effects={effects}
                     gridOffset={scrollOffset}>
-                    {renderItem(item, index, { width: grid.itemRadius * 2.0, height: grid.itemRadius * 2.0 })}
+                    {renderItem(item, index, {
+                      width: grid.itemRadius * 2.0,
+                      height: grid.itemRadius * 2.0,
+                    })}
                   </ReactiveGridItem>
                 );
               })}
@@ -146,4 +142,4 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
 
 const typedMemo: <T>(c: T) => T = React.memo;
 
-export const ReactiveGrid = typedMemo(ReactiveGridElement);
+export const ReactiveGrid = ReactiveGridElement;
