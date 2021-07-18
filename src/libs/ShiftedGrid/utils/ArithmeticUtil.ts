@@ -5,7 +5,7 @@ import { gridToCart, getCartesianDistance } from './CartesianUtil';
 const { EPSILON, diagonallyAdjacentNodeDistance } = GridConstants;
 
 // This is a helper function which 'corrects' the x value of the point being traversed to, depending on the y value of the point being traversed from
-export function correctHorizontalTraversal(fromPointY: number, traversalMagnitude: number): number {
+export function xComponentAdjustment(fromPointY: number, traversalMagnitude: number): number {
   if (fromPointY % 2 === 0) {
     // For diagonal moves, if fromPointY is even we use Math.ceil...
     return Math.ceil(traversalMagnitude / 2);
@@ -26,7 +26,7 @@ export function correctHorizontalTraversal(fromPointY: number, traversalMagnitud
  */
 export const traverseGrid = (function () {
   // This little function determines a horizontal offset, which changes based on the y-value of the row we're moving from
-  const dx = correctHorizontalTraversal;
+  const dx = xComponentAdjustment;
 
   // The actual traverse function...
   return function (p: Index2D, direction: GridDirection, m: number): Index2D {

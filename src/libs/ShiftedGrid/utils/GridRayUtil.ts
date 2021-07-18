@@ -1,4 +1,4 @@
-import { correctHorizontalTraversal } from '../utils';
+import { xComponentAdjustment as dx } from '../utils';
 import { Index2D, GridDirection, SlopeInterceptLine, GridRay, CartesianSlope } from '../types';
 import { gridToCart } from './CartesianUtil';
 
@@ -7,7 +7,6 @@ import { gridToCart } from './CartesianUtil';
 
 export function createGridRay(startCoord: Index2D, direction: GridDirection): GridRay {
   const { x: p1x, y: p1y } = startCoord;
-  const dx = correctHorizontalTraversal;
 
   return {
     startCoord,
