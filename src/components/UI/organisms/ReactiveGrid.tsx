@@ -9,11 +9,11 @@ import {
   Index2D,
   normalize2D,
   Point2D,
-  Scale2D,
   ShiftedGrid,
   Size2D,
 } from '../../../libs';
 import { createMagnificationEffect } from '../../../types/ItemStyleEffect';
+import { BoundingRectUtil } from '../../../utils';
 import { ReactiveGridItem } from './ReactiveGridItem';
 
 interface ReactiveGridProps<T> {
@@ -32,33 +32,6 @@ interface ReactiveGridProps<T> {
 
  Because of the way we will use ReactiveGrid in this project, this method will work, albeit a bit more confusing and verbose should we need to match the exact functionality of React.FC in the future
  */
-
-function getBoundingRectCenter(rect: BoundingRect): Point2D {
-  return {
-    x: 0.5 * (rect.left + rect.right),
-    y: 0.5 * (rect.top + rect.bottom),
-  };
-}
-
-function getScaledBoundingRect(rect: BoundingRect, scale: Scale2D): BoundingRect {
-  const center = getBoundingRectCenter(rect);
-  return {
-    width: scale.x * rect.width,
-    height: scale.y * rect.height,
-    top: scale.y * (rect.top - center.y),
-    left: scale.x * (rect.left - center.x),
-    bottom: scale.y * (rect.bottom - center.y),
-    right: scale.x * (rect.right - center.x),
-  };
-}
-
-function getNormalizedBoundingRect(rect: BoundingRect, gridSize: Size2D): BoundingRect {
-  const inverseScale: Scale2D = {
-    x: 1 / gridSize.width,
-    y: 1 / gridSize.height,
-  };
-  return getScaledBoundingRect(rect, inverseScale);
-}
 
 const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElement = (props) => {
   // destructure props
@@ -84,7 +57,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   const handleResize = useCallback((info: ContentRect) => {
     const { bounds } = info;
     if (bounds !== undefined) {
-      setGridCenter(getBoundingRectCenter(bounds));
+      setGridCenter(BoundingRectUtil.getCenter(bounds));
       setGridBounds(bounds);
     }
   }, []);
@@ -102,39 +75,10 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
     [grid.unitSize, scrollOffset],
   );
 
-  const normalizedScrollOffset: Point2D = useMemo(
-    () => ({
-      x: Math.floor(scrollOffset.x / grid.unitSize.width),
-      y: Math.floor(scrollOffset.y / grid.unitSize.height),
-    }),
-    [scrollOffset, grid],
-  );
-
-  /*
-  // Not sure why this is still here
-  const gridOffset: Point2D = useMemo(() => {
-    const xOffset = 0.5 * MathUtil.modulo(normalizedScrollOffset.y, 2);
-    return {
-      x: scrollOffset.x - grid.unitSize.width * (Math.floor(normalizedScrollOffset.x) + xOffset),
-      y: scrollOffset.y - grid.unitSize.height * Math.floor(normalizedScrollOffset.y),
-    };
-  }, [grid.unitSize, scrollOffset, normalizedScrollOffset]);
-  */
-  /* GRID LAYOUT VARS */
-  /*
-  also gonna be honest, don't remember why this is here
-  const numberOfItemsPerAxis: XYNumeric = useMemo(
-    () => ({
-      x: Math.floor(windowedBounds.width / grid.unitSize.width),
-      y: Math.floor(windowedBounds.height / grid.unitSize.height),
-    }),
-    [grid, windowedBounds],
-  );
-  */
-
+  // Calculate array of items in windowed scroll area
   const gridCoordsInWindowedScrollArea: Index2D[] = useMemo(() => {
     // Define some useful constants
-    const scaledWindowedBounds = getNormalizedBoundingRect(windowedBounds, grid.unitSize);
+    const scaledWindowedBounds = BoundingRectUtil.getNormalized(windowedBounds, grid.unitSize);
     const ceilOfWidth = Math.ceil(scaledWindowedBounds.width);
     const ceilOfHeight = Math.ceil(scaledWindowedBounds.height);
     const ceilOfWidthPlusOne = ceilOfWidth + 1;
@@ -185,7 +129,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
                     index={index}
                     effects={effects}
                     gridOffset={scrollOffset}>
-                    {renderItem(item, index, grid.unitSize)}
+                    {renderItem(item, index, { width: grid.itemRadius * 2.0, height: grid.itemRadius * 2.0 })}
                   </ReactiveGridItem>
                 );
               })}
