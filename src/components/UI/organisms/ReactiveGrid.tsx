@@ -5,8 +5,7 @@ import { MousePositionContextProvider } from '../../../contexts';
 import { useDragDisplacement } from '../../../hooks';
 import {
   cartToGrid,
-  createShiftedGrid,
-  gridCoordToIndex,
+  GridUtil,
   Index2D,
   normalize2D,
   Point2D,
@@ -14,7 +13,6 @@ import {
   ShiftedGrid,
   Size2D,
 } from '../../../libs';
-import { useSelectEmojis } from '../../../store/emojiList/selectors';
 import { createMagnificationEffect } from '../../../types/ItemStyleEffect';
 import { ReactiveGridItem } from './ReactiveGridItem';
 
@@ -27,7 +25,7 @@ interface ReactiveGridProps<T> {
   renderItem: (item: T, index: number, size: Size2D) => React.ReactElement | string | null;
 }
 
-/*.
+/*
  I would love to make ReactiveGridElement a React.FC, however since there are generic types associated with ReactiveGridProps we cannot do this.
  There are some good resources here for why this needs to be done this way https://wanago.io/2020/03/09/functional-react-components-with-generic-props-in-typescript/
  It's just a limitation of typescript.  Here's another good resource: https://stackoverflow.com/questions/53958028/how-to-use-generics-in-props-in-react-in-a-functional-component
@@ -68,7 +66,6 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
 
   /* HOOKS */
   const dragDisplacement = useDragDisplacement();
-  const emojis = useSelectEmojis();
 
   // state vars
   const [gridCenter, setGridCenter] = useState<Point2D>({ x: 0, y: 0 });
@@ -94,7 +91,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
 
   // when item spacing or item radius changes, we need to recreate the grid math functions
   const grid: ShiftedGrid = useMemo(
-    () => createShiftedGrid(itemRadius, itemSpacing, gridCenter),
+    () => GridUtil.createShiftedGrid(itemRadius, itemSpacing, gridCenter),
     [itemRadius, itemSpacing, gridCenter],
   );
 
@@ -178,7 +175,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
           <>
             <div ref={measureRef} className="w-full h-full bg-gray-600">
               {gridCoordsInWindowedScrollArea.map((gridCoord: Index2D) => {
-                const index = gridCoordToIndex(gridCoord);
+                const index = GridUtil.coordToIndex(gridCoord);
                 const item = items[index];
 
                 return (

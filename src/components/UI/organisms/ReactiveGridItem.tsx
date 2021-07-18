@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useMousePositionContext } from '../../../hooks';
-import { add2D, Point2D, ShiftedGrid } from '../../../libs';
+import { add2D, GridUtil, Point2D, ShiftedGrid } from '../../../libs';
 import { ItemStyleEffect } from '../../../types';
 
 type ReactiveGridItemProps = React.PropsWithChildren<{
@@ -18,7 +18,7 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
   const mousePosition = useMousePositionContext().mousePosition;
 
   const itemPosition = useMemo(
-    () => add2D(gridOffset, grid.gridCoordToScreenPoint(grid.indexToGridCoord(index))),
+    () => add2D(gridOffset, grid.gridCoordToScreenPoint(GridUtil.indexToCoord(index))),
     [grid, index, gridOffset],
   );
 

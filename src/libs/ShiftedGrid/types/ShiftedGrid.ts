@@ -14,8 +14,6 @@ export type ShiftedGrid = {
   itemRadius: number;
   itemSpacing: number;
   unitSize: Size2D;
-  indexToGridCoord: (index: number) => Index2D;
-  gridCoordToIndex: (coord: Index2D) => number;
   gridCoordToScreenPoint: (coord: Index2D) => Point2D;
   screenPointToGridCoord: (point: Point2D) => Index2D;
 };

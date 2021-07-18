@@ -4,7 +4,7 @@ Here are some useful functions for various properties of Rings within an Shifted
 */
 
 import { add2D, DirectionFromCenterToCorner, Index2D, RingCorner } from '../types';
-import { traverseGrid } from './ArithmeticUtil';
+import { GridUtil } from './GridUtil';
 
 // Returns the count of all nodes up to and including a ring specified by index
 export function getSumOfAllNodesIncluding(ringIndex: number) {
@@ -51,7 +51,7 @@ export const getRingCornerCoord = (function () {
   const origin: Index2D = { x: 0, y: 0 };
 
   return function (ringIndex: number, ringCorner: RingCorner): Index2D {
-    let cornerPoint = traverseGrid(origin, DirectionFromCenterToCorner[ringCorner], ringIndex);
+    let cornerPoint = GridUtil.traverse(origin, DirectionFromCenterToCorner[ringCorner], ringIndex);
 
     // special case for corner 5, we need to add 1 to the x-value
     if (ringCorner === 5) {
