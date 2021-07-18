@@ -102,9 +102,10 @@ export const createMagnificationEffect = (function () {
     const getScale = createScaleFunction(effectRadius, maximumScale);
 
     return {
-      getStyle: function (itemPosition: Point2D, effectPosition: Point2D) {
-        const { x, y } = getTranslation(itemPosition, effectPosition);
-        const s = getScale(itemPosition, effectPosition);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      getStyle: function (itemPosition: Point2D, mousePosition: Point2D, centerPosition: Point2D) {
+        const { x, y } = getTranslation(itemPosition, mousePosition);
+        const s = getScale(itemPosition, mousePosition);
 
         return {
           transform: `translate(${x}px, ${y}px) scale(${s}, ${s})`,

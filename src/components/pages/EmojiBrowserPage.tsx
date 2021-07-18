@@ -43,7 +43,7 @@ const EmojiBrowserPageElement: React.FC<EmojiBrowserPageProps> = (props) => {
               height: gridSize.height,
             }}>
             <ReactiveGrid
-              magnification={0}
+              magnification={1}
               effectRadius={200}
               itemRadius={30}
               itemSpacing={20}

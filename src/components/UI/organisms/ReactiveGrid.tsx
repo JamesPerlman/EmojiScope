@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import Measure, { BoundingRect, ContentRect } from 'react-measure';
 import 'tailwindcss/tailwind.css';
-import { MousePositionContextProvider } from '../../../contexts';
+import { MousePositionContextConsumer, MousePositionContextProvider } from '../../../contexts';
 import { useDragDisplacement } from '../../../hooks';
 import {
   add2D,
@@ -14,7 +14,7 @@ import {
   Size2D,
   subtract2D,
 } from '../../../libs';
-import { createMagnificationEffect } from '../../../types/ItemStyleEffect';
+import { createEdgeFadeEffect, createMagnificationEffect } from '../../../types/ItemStyleEffect';
 import { BoundingRectUtil } from '../../../utils';
 import { ReactiveGridItem } from './ReactiveGridItem';
 
@@ -60,6 +60,8 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
 
   // when item spacing or item radius changes, we need to recreate the grid math functions
   const grid: ShiftedGrid = useMemo(() => {
+
+    // We need to adjust the position of the gridCenter since our container doesn't start at the top-left of the page
     const containerTopLeft: Point2D = {
       x: windowedBounds.left,
       y: windowedBounds.top,
@@ -114,15 +116,26 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
     return gridCoords;
   }, [grid, windowedBounds, scrollOffset]);
 
+  // Transform mouse position
+  const adjustMousePosition = useCallback((inputMousePosition: Point2D): Point2D => {
+    return inputMousePosition;
+  }, []);
+
   /* ItemStyleEffects */
   const effects = useMemo(() => {
+    // create magnify effect
     const magnify = createMagnificationEffect(effectRadius, magnification);
-    return [magnify];
-  }, [effectRadius, magnification]);
+
+    // create edgeFade effect
+    const fadeDropOffDistance = Math.SQRT1_2 * Math.min(grid.unitSize.width, grid.unitSize.height);
+    const edgeFade = createEdgeFadeEffect(windowedBounds.width * 0.4, fadeDropOffDistance);
+
+    return [edgeFade, magnify];
+  }, [effectRadius, magnification, windowedBounds.width, grid.unitSize]);
 
   /* RENDER */
   return (
-    <MousePositionContextProvider>
+    <MousePositionContextProvider transformMousePosition={adjustMousePosition}>
       <Measure bounds onResize={handleResize}>
         {({ measureRef }) => (
           <>
@@ -137,6 +150,10 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
                     grid={grid}
                     index={index}
                     effects={effects}
+                    gridCenter={{
+                      x: 0.5 * windowedBounds.width,
+                      y: 0.5 * windowedBounds.height,
+                    }}
                     gridOffset={scrollOffset}>
                     {renderItem(item, index, {
                       width: grid.itemRadius * 2.0,
@@ -146,6 +163,20 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
                 );
               })}
             </div>
+
+            <MousePositionContextConsumer>
+              {({ mousePosition }) => (
+                <div
+                  className="bg-yellow-600 w-24 h-24"
+                  style={{
+                    position: 'absolute',
+                    left: `${mousePosition.x}px`,
+                    top: `${mousePosition.y}px`,
+                  }}>
+                  X
+                </div>
+              )}
+            </MousePositionContextConsumer>
           </>
         )}
       </Measure>

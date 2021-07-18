@@ -10,14 +10,20 @@ export const MousePositionContext = React.createContext<MousePositionContextValu
   mousePosition: origin2D,
 });
 
-export type MousePositionContextProviderProps = React.PropsWithChildren<{}>;
+export type MousePositionContextProviderProps = React.PropsWithChildren<{
+  transformMousePosition?: (inputMousePosition: Point2D) => Point2D
+}>;
 
 export const MousePositionContextProvider: React.FC<MousePositionContextProviderProps> = (
   props,
 ) => {
-  const { children } = props;
+  const { children, transformMousePosition } = props;
 
-  const mousePosition = useMousePosition();
+  let mousePosition = useMousePosition();
+
+  if (transformMousePosition !== undefined) {
+    mousePosition = transformMousePosition(mousePosition);
+  }
 
   return (
     <MousePositionContext.Provider value={{ mousePosition }}>

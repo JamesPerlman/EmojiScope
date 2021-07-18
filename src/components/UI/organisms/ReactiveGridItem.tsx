@@ -7,11 +7,12 @@ type ReactiveGridItemProps = React.PropsWithChildren<{
   grid: ShiftedGrid;
   index: number;
   effects?: ItemStyleEffect[];
+  gridCenter: Point2D;
   gridOffset: Point2D;
 }>;
 
 const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
-  const { children, grid, index, effects, gridOffset } = props;
+  const { children, grid, index, effects, gridCenter, gridOffset } = props;
 
   // TODO: a way of turning on & off effects
   // Grabbing mousePosition from a context is SO MUCH FASTER than using useMousePosition here!
@@ -32,10 +33,10 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
     return (effects ?? []).reduce((prevStyle: React.CSSProperties, curEffect: ItemStyleEffect) => {
       return {
         ...prevStyle,
-        ...curEffect.getStyle(itemPosition, mousePosition),
+        ...curEffect.getStyle(itemPosition, mousePosition, gridCenter),
       };
     }, {} as React.CSSProperties);
-  }, [effects, itemPosition, mousePosition]);
+  }, [effects, itemPosition, mousePosition, gridCenter]);
 
   return (
     <div
