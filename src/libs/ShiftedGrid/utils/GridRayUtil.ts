@@ -11,6 +11,7 @@ export function createGridRay(startCoord: Index2D, direction: GridDirection): Gr
   return {
     startCoord,
     direction,
+    // TODO: this should be a dedicated util function, not an instance method
     contains: function ({ x: p2x, y: p2y }: Index2D): boolean {
       switch (direction) {
         case GridDirection.NX:
@@ -47,6 +48,7 @@ export function createGridRay(startCoord: Index2D, direction: GridDirection): Gr
           return p2x >= p1x && p2y >= p1y && p2x === p1x + (p2y - p1y) - dx(p1y, p2y - p1y);
       }
     },
+    // TODO: this should be a dedicated util function, not an instance method
     asCartLine(): SlopeInterceptLine {
       const slope = CartesianSlope[this.direction];
 
