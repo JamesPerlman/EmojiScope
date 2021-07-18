@@ -11,7 +11,7 @@ import {
   ShiftedGrid,
   subtract2D,
 } from '../types';
-import { cartToGrid, getCartesianDistance, gridToCart } from './CartesianUtil';
+import { CartesianUtil } from './CartesianUtil';
 import { createGridRay } from './GridRayUtil';
 import { getLineIntersection } from './LineUtil';
 import { getGridQuadrant } from './QuadrantUtil';
@@ -87,7 +87,7 @@ export const GridUtil = (function () {
         unitSize,
 
         gridCoordToScreenPoint: function (coord): Point2D {
-          const { x: cx, y: cy } = gridToCart(coord);
+          const { x: cx, y: cy } = CartesianUtil.gridToCart(coord);
           return {
             x: ox + unitSize.width * cx,
             y: oy + unitSize.height * cy,
@@ -99,7 +99,7 @@ export const GridUtil = (function () {
             x: (gx - ox) / unitSize.width,
             y: (gy - oy) / unitSize.height,
           };
-          return cartToGrid(cartPoint);
+          return CartesianUtil.cartToGrid(cartPoint);
         },
       };
     };
@@ -151,8 +151,8 @@ export const GridUtil = (function () {
     // We use this cartesian trick because otherwise we'd have to set up an algebraic inequality and solve for variables inside ceil and floor functions and that's pretty difficult...
     // I may take a crack at that someday...
 
-    const cartPointA: Point2D = gridToCart(coordA);
-    const cartPointB: Point2D = gridToCart(coordB);
+    const cartPointA: Point2D = CartesianUtil.gridToCart(coordA);
+    const cartPointB: Point2D = CartesianUtil.gridToCart(coordB);
 
     // Since we already covered the case where the points have the same y-value, we are just looking to see if the slope between the points is within EPSILON of ±2.0
     // If so, then we can consider the points to be colinear and calculate their distance
@@ -180,7 +180,7 @@ export const GridUtil = (function () {
     // But for our use case in this EmojiScope project I highly doubt we will ever come across this problem, so I'm gonna just go for it because time is of the essence.
 
     return Math.round(
-      getCartesianDistance(cartPointA, cartPointB) / diagonallyAdjacentNodeDistance,
+      CartesianUtil.getDistance(cartPointA, cartPointB) / diagonallyAdjacentNodeDistance,
     );
 
     // There is absolutely a much more correct way to rewrite this entire function to be completely robust to all inputs, and perhaps someday it may be worth exploring.
@@ -218,8 +218,8 @@ export const GridUtil = (function () {
       return true;
     }
 
-    const cartPointA: Point2D = gridToCart(coordA);
-    const cartPointB: Point2D = gridToCart(coordB);
+    const cartPointA: Point2D = CartesianUtil.gridToCart(coordA);
+    const cartPointB: Point2D = CartesianUtil.gridToCart(coordB);
 
     // Since we already covered the case where the points have the same y-value, we are just looking to see if the slope between the points is within EPSILON of ±2.0
     // If so, then we can consider the points to be colinear and calculate their distance
@@ -342,7 +342,7 @@ export const GridUtil = (function () {
       }
 
       // Get intersectionPoint as grid coordinate
-      const leadingRingCornerCoord = cartToGrid(intersectionPoint);
+      const leadingRingCornerCoord = CartesianUtil.cartToGrid(intersectionPoint);
 
       // leadingRingConerCoord should always be on a ring corner.
       // TODO: For direction PXNY we need to add 1 to the x-coordinate

@@ -1,6 +1,6 @@
 import { CartesianSlope, GridDirection, GridRay, Index2D, SlopeInterceptLine } from '../types';
 import { xComponentAdjustment as dx } from '../utils';
-import { gridToCart } from './CartesianUtil';
+import { CartesianUtil } from './CartesianUtil';
 
 // I am making factory methods instead of classes because my research and intuition both indicate that this will be more performant and efficient when these functions are run many times
 // At some point I will make the time to benchmark this and see if my hypothesis is correct.
@@ -52,7 +52,7 @@ export function createGridRay(startCoord: Index2D, direction: GridDirection): Gr
     asCartLine(): SlopeInterceptLine {
       const slope = CartesianSlope[this.direction];
 
-      const { x: cx, y: cy } = gridToCart(startCoord);
+      const { x: cx, y: cy } = CartesianUtil.gridToCart(startCoord);
 
       const intercept = cy - slope * cx;
 

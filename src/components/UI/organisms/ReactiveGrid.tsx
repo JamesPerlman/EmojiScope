@@ -5,7 +5,7 @@ import { MousePositionContextProvider } from '../../../contexts';
 import { useDragDisplacement } from '../../../hooks';
 import {
   add2D,
-  cartToGrid,
+  CartesianUtil,
   GridUtil,
   Index2D,
   normalize2D,
@@ -110,7 +110,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
           y: y - 0.5 * ceilOfHeight - scaledScrollOffset.y,
         };
         // Convert the cartPoint to a gridPoint
-        const gridCoord = cartToGrid(cartPoint);
+        const gridCoord = CartesianUtil.cartToGrid(cartPoint);
 
         // Add it to our gridCoords array
         gridCoords.push(gridCoord);
