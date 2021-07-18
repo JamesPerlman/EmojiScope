@@ -1,9 +1,8 @@
-import { MathUtil } from '../../../utils';
-import { GridConstants } from '../constants';
 import { indexToGridCoord } from '.';
+import { GridConstants } from '../constants';
 import { Index2D, Point2D, ShiftedGrid } from '../types';
-import { gridCoordToIndex } from './IndexUtil';
 import { cartToGrid, gridToCart } from './CartesianUtil';
+import { gridCoordToIndex } from './IndexUtil';
 
 // TODO: add JSDoc
 export const createShiftedGrid = (function () {

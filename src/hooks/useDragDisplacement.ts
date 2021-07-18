@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { add2D, Point2D, subtract2D } from '../libs';
 
 // Adapted from https://valtism.com/src/use-drag-scroll.html

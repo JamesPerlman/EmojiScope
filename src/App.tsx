@@ -5,7 +5,6 @@ import { EmojiBrowserPage } from './components';
 import { EmojiListActionCreator } from './store/emojiList/actionCreators';
 
 function App() {
-
   const dispatch = useDispatch();
 
   // app startup effects

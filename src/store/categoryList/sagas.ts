@@ -8,7 +8,9 @@ import { CategoryListActionTypes } from './actionTypes';
 */
 function* fetchCategoryListSaga() {
   try {
-    const categories: SagaReturnType<typeof api.categories.listAll> = yield call(api.categories.listAll);
+    const categories: SagaReturnType<typeof api.categories.listAll> = yield call(
+      api.categories.listAll,
+    );
     yield put(CategoryListActionCreator.fetchSuccess(categories));
   } catch (error) {
     yield put(CategoryListActionCreator.fetchFailure(`${error}`));

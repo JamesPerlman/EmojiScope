@@ -1,24 +1,22 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import Measure, { BoundingRect, ContentRect } from 'react-measure';
-
-import { ReactiveGridItem } from './ReactiveGridItem';
-
 import 'tailwindcss/tailwind.css';
-import { createMagnificationEffect } from '../../../types/ItemStyleEffect';
-import {
-  createShiftedGrid,
-  ShiftedGrid,
-  Point2D,
-  Index2D,
-  Scale2D,
-  Size2D,
-  cartToGrid,
-  normalize2D,
-  gridCoordToIndex,
-} from '../../../libs';
-import { useDragDisplacement } from '../../../hooks';
 import { MousePositionContextProvider } from '../../../contexts';
+import { useDragDisplacement } from '../../../hooks';
+import {
+  cartToGrid,
+  createShiftedGrid,
+  gridCoordToIndex,
+  Index2D,
+  normalize2D,
+  Point2D,
+  Scale2D,
+  ShiftedGrid,
+  Size2D,
+} from '../../../libs';
 import { useSelectEmojis } from '../../../store/emojiList/selectors';
+import { createMagnificationEffect } from '../../../types/ItemStyleEffect';
+import { ReactiveGridItem } from './ReactiveGridItem';
 
 interface ReactiveGridProps<T> {
   itemRadius: number;

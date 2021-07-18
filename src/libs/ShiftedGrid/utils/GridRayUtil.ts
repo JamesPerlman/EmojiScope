@@ -1,5 +1,5 @@
+import { CartesianSlope, GridDirection, GridRay, Index2D, SlopeInterceptLine } from '../types';
 import { xComponentAdjustment as dx } from '../utils';
-import { Index2D, GridDirection, SlopeInterceptLine, GridRay, CartesianSlope } from '../types';
 import { gridToCart } from './CartesianUtil';
 
 // I am making factory methods instead of classes because my research and intuition both indicate that this will be more performant and efficient when these functions are run many times

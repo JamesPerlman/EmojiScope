@@ -1,6 +1,6 @@
 import { GridConstants } from '../constants';
 import { GridDirection, Index2D, Point2D, subtract2D } from '../types';
-import { gridToCart, getCartesianDistance } from './CartesianUtil';
+import { getCartesianDistance, gridToCart } from './CartesianUtil';
 
 const { EPSILON, diagonallyAdjacentNodeDistance } = GridConstants;
 
@@ -143,7 +143,7 @@ export function isCoordBetween(p: Index2D, a: Index2D, b: Index2D) {
   const yMin = Math.min(a.y, b.y);
   const yMax = Math.max(a.y, b.y);
 
-  return (p.x >= xMin) && (p.x <= xMax) && (p.y >= yMin) && (p.y <= yMax);
+  return p.x >= xMin && p.x <= xMax && p.y >= yMin && p.y <= yMax;
 }
 
 /**

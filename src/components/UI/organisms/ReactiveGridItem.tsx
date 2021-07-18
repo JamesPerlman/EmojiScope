@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useMousePosition, useMousePositionContext } from '../../../hooks';
+import { useMousePositionContext } from '../../../hooks';
 import { add2D, Point2D, ShiftedGrid } from '../../../libs';
 import { ItemStyleEffect } from '../../../types';
 

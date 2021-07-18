@@ -1,8 +1,7 @@
 import React from 'react';
-import { EmojiView, ReactiveGrid } from '../UI';
-
 import 'tailwindcss/tailwind.css';
 import { useSelectEmojis } from '../../store/emojiList/selectors';
+import { EmojiView, ReactiveGrid } from '../UI';
 
 type EmojiBrowserPageProps = {};
 

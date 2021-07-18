@@ -1,7 +1,6 @@
 import { Category } from '../../models';
 import { CategoryListActionError } from './types';
 
-
 // Action Types Enum
 export enum CategoryListActionTypes {
   BeginFetchRequest = 'CategoryListBeginFetchRequest',

@@ -6,7 +6,6 @@ import {
   IntersectorDirectionForQuadrant,
   origin2D,
 } from '../types';
-
 import { traverseGrid, unreliableGridDistanceBetween } from './ArithmeticUtil';
 import { cartToGrid } from './CartesianUtil';
 import { createGridRay } from './GridRayUtil';
@@ -15,9 +14,9 @@ import { getGridQuadrant } from './QuadrantUtil';
 import {
   getFirstNodeIndexInRing,
   getLeadingRingCorner,
+  getRingCornerCoord,
   getRingCornerIndex,
   getRingCornerOfCornerCoord,
-  getRingCornerCoord,
   getRingCornerSubIndex,
   getRingIndex,
 } from './RingUtil';

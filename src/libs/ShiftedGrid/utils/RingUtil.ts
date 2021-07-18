@@ -3,7 +3,7 @@ The way we will be using the ShiftedGrid and laying out nodes within it will rel
 Here are some useful functions for various properties of Rings within an ShiftedGrid
 */
 
-import { add2D, DirectionFromCenterToCorner, GridDirection, Index2D, RingCorner } from '../types';
+import { add2D, DirectionFromCenterToCorner, Index2D, RingCorner } from '../types';
 import { traverseGrid } from './ArithmeticUtil';
 
 // Returns the count of all nodes up to and including a ring specified by index
@@ -13,7 +13,7 @@ export function getSumOfAllNodesIncluding(ringIndex: number) {
 
 // Returns the first index in the given ring
 export function getFirstNodeIndexInRing(ringIndex: number) {
-  return (ringIndex) * (3 * ringIndex - 2);
+  return ringIndex * (3 * ringIndex - 2);
 }
 
 // Returns the index of the ring that contains the nodeIndex
@@ -62,16 +62,15 @@ export const getRingCornerCoord = (function () {
   };
 })();
 
-
 // Returns the RingCorner value of a coord in a ring.  Fast, too!
 // input coord MUST be a CornerPoint, otherwise this result is not valid.
 
 export function getRingCornerOfCornerCoord({ x: cx, y: cy }: Index2D): RingCorner {
   if (cy === 0) {
-    return (cx < 0) ? 3 : 0;
+    return cx < 0 ? 3 : 0;
   } else if (cy > 0) {
-    return (cx >= 0) ? 1 : 2;
+    return cx >= 0 ? 1 : 2;
   } else {
-    return (cx > 0) ? 5 : 4;
+    return cx > 0 ? 5 : 4;
   }
 }
