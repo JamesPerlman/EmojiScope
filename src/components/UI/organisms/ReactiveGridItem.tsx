@@ -33,7 +33,7 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
     return (effects ?? []).reduce((prevStyle: React.CSSProperties, curEffect: ItemStyleEffect) => {
       return {
         ...prevStyle,
-        ...curEffect.getStyle(itemPosition, mousePosition, gridCenter),
+        ...curEffect.getStyle({ itemPosition, mousePosition, centerPosition: gridCenter }),
       };
     }, {} as React.CSSProperties);
   }, [effects, itemPosition, mousePosition, gridCenter]);

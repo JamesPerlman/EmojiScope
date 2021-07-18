@@ -1,4 +1,4 @@
-import { Point2D } from '../../libs';
+import { origin2D, Point2D, subtract2D } from '../../libs';
 import { ItemStyleEffect } from './ItemStyleEffect';
 
 /*
@@ -103,9 +103,10 @@ export const createMagnificationEffect = (function () {
 
     return {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      getStyle: function (itemPosition: Point2D, mousePosition: Point2D, centerPosition: Point2D) {
-        const { x, y } = getTranslation(itemPosition, mousePosition);
-        const s = getScale(itemPosition, mousePosition);
+      getStyle: function ({ itemPosition, centerPosition }) {
+        const effectPosition = centerPosition || origin2D;
+        const { x, y } = getTranslation(itemPosition, effectPosition);
+        const s = getScale(itemPosition, effectPosition);
 
         return {
           transform: `translate(${x}px, ${y}px) scale(${s}, ${s})`,

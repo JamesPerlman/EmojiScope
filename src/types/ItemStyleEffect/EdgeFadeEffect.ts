@@ -1,4 +1,4 @@
-import { getCartesianDistance, Point2D } from '../../libs';
+import { getCartesianDistance, origin2D, Point2D } from '../../libs';
 import { ItemStyleEffect } from './ItemStyleEffect';
 
 // this creates an edge-fade effect which produces an opacity value that drops off from 100% -> 0% between (radius, radius + dropoff)
@@ -16,9 +16,9 @@ export function createEdgeFadeEffect(startFadeOutDistance: number, fadeDropOffDi
   return {
     // itemPosition is intended to be the position of the ReactiveGridItem
     // effectPosition is intended to be the center of the ReactiveGrid
-    getStyle: function (itemPosition: Point2D, mousePosition: Point2D, centerPosition: Point2D) {
+    getStyle: function ({ itemPosition, centerPosition }) {
       return {
-        opacity: getOpacity(getCartesianDistance(itemPosition, centerPosition)),
+        opacity: getOpacity(getCartesianDistance(itemPosition, centerPosition ?? origin2D)),
       };
     },
   };
