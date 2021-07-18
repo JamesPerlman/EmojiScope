@@ -113,8 +113,6 @@ export const useDragDisplacement = (function () {
       };
     }, []);
 
-    console.log(JSON.stringify(displacementState));
-
     return {
       x: displacementState.x,
       y: displacementState.y,
