@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Measure, { BoundingRect, ContentRect } from 'react-measure';
 import 'tailwindcss/tailwind.css';
 import { MousePositionContextProvider } from '../../../contexts';
 import { useDragDisplacement } from '../../../hooks';
 import {
+  add2D,
   cartToGrid,
   GridUtil,
   Index2D,
@@ -11,6 +12,7 @@ import {
   Point2D,
   ShiftedGrid,
   Size2D,
+  subtract2D,
 } from '../../../libs';
 import { createMagnificationEffect } from '../../../types/ItemStyleEffect';
 import { BoundingRectUtil } from '../../../utils';
@@ -57,13 +59,27 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   }, []);
 
   // when item spacing or item radius changes, we need to recreate the grid math functions
-  const grid: ShiftedGrid = useMemo(
-    () => GridUtil.createShiftedGrid(itemRadius, itemSpacing, gridCenter),
-    [itemRadius, itemSpacing, gridCenter],
-  );
+  const grid: ShiftedGrid = useMemo(() => {
+    const containerTopLeft: Point2D = {
+      x: windowedBounds.left,
+      y: windowedBounds.top,
+    };
+
+    const halfItemSizeOffset: Point2D = {
+      x: 0.5 * (itemRadius + itemSpacing),
+      y: 0.5 * (itemRadius + itemSpacing),
+    };
+
+    const offsetCenter = add2D(halfItemSizeOffset, subtract2D(gridCenter, containerTopLeft));
+    return GridUtil.createShiftedGrid(itemRadius, itemSpacing, offsetCenter);
+  }, [itemRadius, itemSpacing, gridCenter, windowedBounds]);
 
   // calculate scrollOffset
-  const scrollOffset: Point2D = useMemo(() => dragDisplacement, [dragDisplacement]);
+  const scrollOffset: Point2D = useMemo(() => {
+    return dragDisplacement;
+  }, [dragDisplacement, gridCenter]);
+
+  // scaledScrollOffset is in grid coordinate space
   const scaledScrollOffset = useMemo(
     () => normalize2D(scrollOffset, grid.unitSize),
     [grid.unitSize, scrollOffset],
@@ -142,4 +158,4 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
 
 const typedMemo: <T>(c: T) => T = React.memo;
 
-export const ReactiveGrid = ReactiveGridElement;
+export const ReactiveGrid = typedMemo(ReactiveGridElement);
