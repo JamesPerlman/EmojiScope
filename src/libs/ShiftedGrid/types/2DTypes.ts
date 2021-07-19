@@ -11,6 +11,7 @@ export type Index2D = XYNumeric;
 export type Point2D = XYNumeric;
 export type Vector2D = XYNumeric;
 export type Scale2D = XYNumeric;
+export type Velocity2D = XYNumeric;
 
 export const origin2D: XYNumeric = { x: 0, y: 0 };
 
