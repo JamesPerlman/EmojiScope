@@ -43,7 +43,10 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
   const { itemRadius, itemSpacing, magnification, effectRadius, items, renderItem } = props;
 
   /* HOOKS */
-  const dragDisplacement = useDragDisplacement();
+  const dragDisplacement = useDragDisplacement({
+    useMomentum: true,
+    damping: 0.95,
+  });
 
   // state vars
   const [gridCenter, setGridCenter] = useState<Point2D>({ x: 0, y: 0 });
