@@ -160,6 +160,10 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
                 const index = GridUtil.coordToIndex(gridCoord);
                 const item = items[index];
 
+                if (item === undefined) {
+                  return null;
+                }
+
                 return (
                   <ReactiveGridItem
                     key={`item_${index}`}
