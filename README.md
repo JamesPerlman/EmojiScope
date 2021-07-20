@@ -30,14 +30,15 @@
   * For the actual data we are leveraging to https://emoji-api.com/ - Many thanks to the developers there for providing a free service.
   * In code, we are using [Axios](https://github.com/axios/axios) 
   * For data deserialization, we are using [io-ts](https://github.com/gcanti/io-ts) which is a beautiful library for JSON decoding, among many other things.
-* Navigation: we are using [React Router](https://reactrouter.com/) which is an industry-standard library for routing in ReactJS for web
+* Navigation: we are using [React Router](https://reactrouter.com/) which is an industry-standard library for routing in ReactJS for web.
 * Misc UI:
   * We are using [TailWind CSS](https://tailwindcss.com/) to make styling a lot easier.
-  * We are leveraging [React Measure](https://github.com/souporserious/react-measure) for reactive styling in certain components
+  * We are leveraging [React Measure](https://github.com/souporserious/react-measure) for reactive styling in certain components.
 * State Management
-  * We are using [Redux](https://redux.js.org/) and [react-redux](https://github.com/reduxjs/react-redux) as the basis of our app data management
-  * We are using [Redux-Saga](https://github.com/redux-saga/redux-saga) for management of side effects
-
+  * We are using [Redux](https://redux.js.org/) and [react-redux](https://github.com/reduxjs/react-redux) as the basis of our app data management.
+  * We are using [Redux-Saga](https://github.com/redux-saga/redux-saga) for management of side effects.
+  * We are using [Redux-Reselect](https://github.com/reduxjs/reselect) to access our redux store.
+ 
 And that's it for our basic stack!  All the UI components like the reactive grid were hand-coded by me, James Perlman!
 
 I hope you enjoy what I've created!
