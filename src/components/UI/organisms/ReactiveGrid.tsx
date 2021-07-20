@@ -155,7 +155,7 @@ const ReactiveGridElement: <T>(props: ReactiveGridProps<T>) => React.ReactElemen
       <Measure bounds onResize={handleResize}>
         {({ measureRef }) => (
           <>
-            <div ref={measureRef} className="w-full h-full bg-gray-600">
+            <div ref={measureRef} className="w-full h-full">
               {gridCoordsInWindowedScrollArea.map((gridCoord: Index2D) => {
                 const index = GridUtil.coordToIndex(gridCoord);
                 const item = items[index];
