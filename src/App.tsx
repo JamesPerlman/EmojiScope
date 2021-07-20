@@ -18,6 +18,8 @@ function App() {
   return (
     <div className="w-full h-full bg-black">
       <Switch>
+        <Route exact path="/" component={EmojiBrowserPage} />
+        
         <Route exact path="/:emoji" component={EmojiBrowserPage} />
         {/* TODO: Make this nice!
         <Route exact path="/:emoji" component={EmojiDetailModal} />
