@@ -3,7 +3,7 @@ import Measure, { ContentRect } from 'react-measure';
 import 'tailwindcss/tailwind.css';
 import { Size2D } from '../../libs';
 import { useSelectEmojis } from '../../store/emojiList/selectors';
-import { EmojiView, ReactiveGrid } from '../UI';
+import { EmojiLink, ReactiveGrid } from '../UI';
 
 type EmojiBrowserPageProps = {};
 
@@ -49,7 +49,7 @@ const EmojiBrowserPageElement: React.FC<EmojiBrowserPageProps> = (props) => {
               itemSpacing={20}
               items={emojis}
               renderItem={(item, index, itemSize) => (
-                <EmojiView char={item?.character} itemSize={itemSize} />
+                <EmojiLink emoji={item} itemSize={itemSize} />
               )}
             />
           </div>
