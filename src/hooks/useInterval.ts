@@ -17,9 +17,6 @@ export type UseIntervalHookOptions = {
   autoStart: boolean; // automaticall start interval when hook is executed
 };
 
-// Define some private convenience types here
-type TimeoutType = ReturnType<typeof setInterval>;
-
 // Define some default convenience consts here
 
 const defaultOptions = { autoStart: false };
@@ -40,7 +37,7 @@ export function useInterval(
 ) {
   const callbackRef = useRef<UserIntervalHookCallback>();
   const delayRef = useRef<number>(delay);
-  const intervalRef = useRef<TimeoutType>();
+  const intervalRef = useRef<number>();
   const isPaused = useRef<boolean>(!options.autoStart);
 
   // This function is meant to be used within setInterval, and it always executes the current callbackRef
@@ -67,7 +64,7 @@ export function useInterval(
 
     // pause means that we are going to remove the current interval completely.
     if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+      window.clearInterval(intervalRef.current);
       intervalRef.current = undefined;
     }
   }, []);
@@ -91,17 +88,17 @@ export function useInterval(
     // if we had a previous intervalRef, we need to clear it before setting a new one.
     // theoretically this should not ever happen, but we need to make sure.
     if (intervalRef.current !== undefined) {
-      clearInterval(intervalRef.current);
+      window.clearInterval(intervalRef.current);
     }
 
     // now, let's use setInterval to start executing the callback
-    intervalRef.current = setInterval(performCurrentCallback, delayRef.current);
+    intervalRef.current = window.setInterval(performCurrentCallback, delayRef.current);
   }, []);
 
   // cleanup function for hook destruction // unmounting
   const unmount = () => {
     if (intervalRef.current !== undefined) {
-      clearInterval(intervalRef.current);
+      window.clearInterval(intervalRef.current);
     }
   };
 
@@ -117,8 +114,8 @@ export function useInterval(
     // since delay has changed, we need to clear the current interval and set a new one
     // but only also if we are not paused
     if (isPaused.current === false && intervalRef.current !== undefined) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = setInterval(performCurrentCallback, delayRef.current);
+      window.clearInterval(intervalRef.current);
+      intervalRef.current = window.setInterval(performCurrentCallback, delayRef.current);
     }
   }, [delay]);
 
@@ -130,7 +127,7 @@ export function useInterval(
     }
 
     if (options.autoStart) {
-      intervalRef.current = setInterval(performCurrentCallback, delayRef.current);
+      intervalRef.current = window.setInterval(performCurrentCallback, delayRef.current);
     }
 
     // cleanup function
