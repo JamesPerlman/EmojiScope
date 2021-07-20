@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import { Route, Switch } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
 import { EmojiBrowserPage } from './components';
 import { EmojiListActionCreator } from './store/emojiList/actionCreators';
@@ -14,8 +15,10 @@ function App() {
   });
 
   return (
-    <div className="w-full h-full bg-white">
-      <EmojiBrowserPage />
+    <div className="w-full h-full bg-black">
+      <Switch>
+        <Route exact path="/" component={EmojiBrowserPage} />
+      </Switch>
     </div>
   );
 }
