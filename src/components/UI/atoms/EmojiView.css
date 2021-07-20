@@ -1,0 +1,5 @@
+.emoji-view-container {
+  display: 'flex';
+  alignItems: 'center';
+  justifyContent: 'center';
+}

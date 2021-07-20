@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import 'tailwindcss/tailwind.css';
 import { Size2D } from '../../../libs';
-
+import './EmojiView.css';
 interface EmojiViewProps {
   char: string;
   style?: React.CSSProperties;
@@ -10,16 +10,18 @@ interface EmojiViewProps {
 
 const EmojiViewElement: React.FC<EmojiViewProps> = (props) => {
   const { char, itemSize, style } = props;
+
+  const dynamicStyle = useMemo(
+    () => ({
+      width: `${itemSize.width - 5}px`,
+      height: `${itemSize.height - 5}px`,
+      fontSize: Math.min(itemSize.width, itemSize.height) - 10,
+    }),
+    [itemSize],
+  );
+
   return (
-    <div
-      style={{
-        width: `${itemSize.width - 5}px`,
-        height: `${itemSize.height - 5}px`,
-        fontSize: Math.min(itemSize.width, itemSize.height) - 10,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+    <div className="emoji-view-container" style={{ ...dynamicStyle, ...(style ?? {}) }}>
       {char}
     </div>
   );
