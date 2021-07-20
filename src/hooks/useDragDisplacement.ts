@@ -1,6 +1,6 @@
 // Inspired by https://valtism.com/src/use-drag-scroll.html
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimationConstants } from '../constants';
 import { add2D, Point2D, subtract2D, Velocity2D } from '../libs';
 import { useInterval } from './useInterval';
@@ -198,7 +198,7 @@ export const useDragDisplacement = (function () {
 
     const lastDecelFrameTime = useRef<number>(0);
 
-    const decelDragCallback = () => {
+    const decelDragCallback = useCallback(() => {
       // we need to get dt, aka the time that has elapsed since startDecelAnimation() was called
       // dt is in seconds
       const dt = 0.001 * (Date.now() - lastDecelFrameTime.current);
@@ -207,7 +207,8 @@ export const useDragDisplacement = (function () {
       // velocity += accel * dt
 
       const { x: vx, y: vy } = mouseSpeed.current;
-      const accel = -20;
+
+      // Just use damping to decrease velocity
       const newVelocity: Velocity2D = {
         x: vx * options.damping,
         y: vy * options.damping,
@@ -220,18 +221,6 @@ export const useDragDisplacement = (function () {
         y: py + newVelocity.y * dt,
       };
 
-      /*
-      const a = -100;
-
-      const v0 = mouseSpeed.current;
-
-      const { x: x0, y: y0 } = displacementRef.current;
-      const newDisplacement: Point2D = {
-        x: x0 + v0.x * dt + 0.5 * a * Math.pow(dt, 2),
-        y: y0 + v0.y * dt + 0.5 * a * Math.pow(dt, 2),
-      };*/
-
-      // console.log(JSON.stringify(newDisplacement));
       mouseSpeed.current = newVelocity;
       displacementRef.current = newDisplacement;
 
@@ -243,9 +232,11 @@ export const useDragDisplacement = (function () {
       );
       if (newVelocityMagnitude < 1) {
         pauseDecelAnimation();
+        console.log('stop decelerating');
       }
       lastDecelFrameTime.current = Date.now();
-    };
+      console.log('decelerating');
+    }, [options.damping]);
 
     const [startDecelAnimation, pauseDecelAnimation] = useInterval(
       decelDragCallback,
