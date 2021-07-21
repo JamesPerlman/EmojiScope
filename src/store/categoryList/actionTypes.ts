@@ -1,5 +1,5 @@
 import { Category } from '../../models';
-import { CategoryListActionError } from './types';
+import { CategoryListActionError } from './modelTypes';
 
 // Action Types Enum
 export enum CategoryListActionTypes {

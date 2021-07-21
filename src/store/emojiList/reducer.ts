@@ -1,5 +1,5 @@
 import { EmojiListActions, EmojiListActionTypes } from './actionTypes';
-import { EmojiListState } from './types';
+import { EmojiListState } from './modelTypes';
 
 const INITIAL_STATE: EmojiListState = {
   loading: false,

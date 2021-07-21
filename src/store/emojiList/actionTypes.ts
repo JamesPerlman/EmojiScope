@@ -1,5 +1,5 @@
 import { Emoji } from '../../models';
-import { EmojiListActionError } from './types';
+import { EmojiListActionError } from './modelTypes';
 
 // Action Types Enum
 export enum EmojiListActionTypes {
