@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useMousePositionContext } from '../../../hooks';
+import { ReactiveGridItemContextProvider, useMousePositionContext } from '../../../contexts';
 import { add2D, GridUtil, Point2D, ShiftedGrid } from '../../../libs';
 import { ItemStyleEffect } from '../../../types';
 
@@ -10,14 +10,6 @@ type ReactiveGridItemProps = React.PropsWithChildren<{
   gridCenter: Point2D;
   gridOffset: Point2D;
 }>;
-
-type ReactiveGridItemContextData = {
-  itemStyle: React.CSSProperties;
-};
-
-const ReactiveGridItemContext = React.createContext<ReactiveGridItemContextData>({ itemStyle: {} });
-
-export const ReactiveGridItemContextConsumer = ReactiveGridItemContext.Consumer;
 
 const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
   const { children, grid, index, effects, gridCenter, gridOffset } = props;
@@ -54,15 +46,11 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
     ...reactiveStyles,
   };
 
-  const contextValue: ReactiveGridItemContextData = {
-    itemStyle,
-  };
-
   return (
     <div style={itemStyle}>
-      <ReactiveGridItemContext.Provider value={contextValue}>
+      <ReactiveGridItemContextProvider itemStyle={itemStyle}>
         {children}
-      </ReactiveGridItemContext.Provider>
+      </ReactiveGridItemContextProvider>
     </div>
   );
 };

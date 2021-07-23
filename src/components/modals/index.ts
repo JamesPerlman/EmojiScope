@@ -1,1 +1,1 @@
-export * from './EmojiDetailModal';
+export * from './Modals';

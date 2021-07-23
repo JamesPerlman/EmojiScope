@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useMousePosition } from '../hooks';
 import { origin2D, Point2D } from '../libs';
 
@@ -10,8 +10,10 @@ export const MousePositionContext = React.createContext<MousePositionContextValu
   mousePosition: origin2D,
 });
 
+export const useMousePositionContext = () => useContext(MousePositionContext);
+
 export type MousePositionContextProviderProps = React.PropsWithChildren<{
-  transformMousePosition?: (inputMousePosition: Point2D) => Point2D
+  transformMousePosition?: (inputMousePosition: Point2D) => Point2D;
 }>;
 
 export const MousePositionContextProvider: React.FC<MousePositionContextProviderProps> = (

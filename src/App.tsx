@@ -2,9 +2,8 @@ import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Route, Switch } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
-import { EmojiBrowserPage } from './components';
-import { EmojiDetailModal } from './components/modals';
-import { EmojiListActionCreator } from './store/emojiList/actionCreators';
+import { EmojiBrowserPage, Modals } from './components';
+import { EmojiListActionCreator } from './store';
 
 function App() {
   const dispatch = useDispatch();
@@ -18,13 +17,9 @@ function App() {
   return (
     <div className="w-full h-full bg-black">
       <Switch>
-        <Route exact path="/" component={EmojiBrowserPage} />
-        
-        <Route exact path="/:emoji" component={EmojiBrowserPage} />
-        {/* TODO: Make this nice!
-        <Route exact path="/:emoji" component={EmojiDetailModal} />
-        */}
+        <Route path={['/', '/:emoji']} component={EmojiBrowserPage} />
       </Switch>
+      <Modals />
     </div>
   );
 }

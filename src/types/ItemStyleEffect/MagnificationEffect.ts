@@ -1,4 +1,4 @@
-import { origin2D, Point2D, subtract2D } from '../../libs';
+import { origin2D, Point2D } from '../../libs';
 import { ItemStyleEffect } from './ItemStyleEffect';
 
 /*

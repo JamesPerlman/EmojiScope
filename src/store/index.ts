@@ -11,3 +11,7 @@ const middleware = applyMiddleware(sagaMiddleware, logger);
 export const store = createStore(rootReducer, middleware);
 
 sagaMiddleware.run(rootSaga);
+
+export * from './actionCreators';
+export * from './useTypedDispatch';
+export * from './useTypedSelector';

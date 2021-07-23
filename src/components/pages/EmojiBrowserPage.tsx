@@ -3,10 +3,11 @@ import Measure, { ContentRect } from 'react-measure';
 import 'tailwindcss/tailwind.css';
 import { Size2D } from '../../libs';
 import { useSelectEmojis } from '../../store/emojiList/selectors';
-import { EmojiLink, ReactiveGrid } from '../UI';
+import { EmojiButton, ReactiveGrid } from '../UI';
 
 type EmojiBrowserPageProps = {};
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const EmojiBrowserPageElement: React.FC<EmojiBrowserPageProps> = (props) => {
   const emojis = useSelectEmojis();
 
@@ -34,8 +35,7 @@ const EmojiBrowserPageElement: React.FC<EmojiBrowserPageProps> = (props) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-          }}
-          >
+          }}>
           <div
             className="p-4"
             style={{
@@ -49,7 +49,7 @@ const EmojiBrowserPageElement: React.FC<EmojiBrowserPageProps> = (props) => {
               itemSpacing={20}
               items={emojis}
               renderItem={(item, index, itemSize) => (
-                <EmojiLink emoji={item} itemSize={itemSize} />
+                <EmojiButton emoji={item} itemSize={itemSize} />
               )}
             />
           </div>
