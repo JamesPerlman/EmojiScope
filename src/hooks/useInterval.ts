@@ -1,7 +1,6 @@
 // inspired by and adapted from https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 
 import { useCallback, useEffect, useRef } from 'react';
-import { setInterval } from 'timers';
 
 // Define some exported convenience types here
 
