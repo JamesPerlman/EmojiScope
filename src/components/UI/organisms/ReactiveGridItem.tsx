@@ -11,6 +11,14 @@ type ReactiveGridItemProps = React.PropsWithChildren<{
   gridOffset: Point2D;
 }>;
 
+type ReactiveGridItemContextData = {
+  itemStyle: React.CSSProperties;
+};
+
+const ReactiveGridItemContext = React.createContext<ReactiveGridItemContextData>({ itemStyle: {} });
+
+export const ReactiveGridItemContextConsumer = ReactiveGridItemContext.Consumer;
+
 const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
   const { children, grid, index, effects, gridCenter, gridOffset } = props;
 
@@ -38,16 +46,23 @@ const ReactiveGridItemElement: React.FC<ReactiveGridItemProps> = (props) => {
     }, {} as React.CSSProperties);
   }, [effects, itemPosition, mousePosition, gridCenter]);
 
+  const itemStyle: React.CSSProperties = {
+    position: 'absolute',
+    overflow: 'visible',
+    width: grid.unitSize.width,
+    height: grid.unitSize.height,
+    ...reactiveStyles,
+  };
+
+  const contextValue: ReactiveGridItemContextData = {
+    itemStyle,
+  };
+
   return (
-    <div
-      style={{
-        position: 'absolute',
-        overflow: 'visible',
-        width: grid.unitSize.width,
-        height: grid.unitSize.height,
-        ...reactiveStyles,
-      }}>
-      {children}
+    <div style={itemStyle}>
+      <ReactiveGridItemContext.Provider value={contextValue}>
+        {children}
+      </ReactiveGridItemContext.Provider>
     </div>
   );
 };
