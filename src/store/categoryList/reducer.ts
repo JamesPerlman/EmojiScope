@@ -1,5 +1,5 @@
 import { CategoryListActions, CategoryListActionTypes } from './actionTypes';
-import { CategoryListState } from './modelTypes';
+import { CategoryListState } from './stateTypes';
 
 const INITIAL_STATE: CategoryListState = {
   loading: false,

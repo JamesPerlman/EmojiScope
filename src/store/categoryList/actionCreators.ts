@@ -5,7 +5,7 @@ import {
   CategoryListRequestFail,
   CategoryListRequestSucceed,
 } from './actionTypes';
-import { CategoryListActionError } from './modelTypes';
+import { CategoryListActionError } from './stateTypes';
 
 // Action Creators
 export const CategoryListActionCreator = {

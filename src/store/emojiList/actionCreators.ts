@@ -5,7 +5,7 @@ import {
   EmojiListRequestFail,
   EmojiListRequestSucceed,
 } from './actionTypes';
-import { EmojiListActionError } from './modelTypes';
+import { EmojiListActionError } from './stateTypes';
 
 // Action Creators
 export const EmojiListActionCreator = {
