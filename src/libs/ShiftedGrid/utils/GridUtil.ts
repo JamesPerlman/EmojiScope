@@ -12,8 +12,8 @@ import {
   subtract2D,
 } from '../types';
 import { CartesianUtil } from './CartesianUtil';
-import { createGridRay } from './GridRayUtil';
-import { getLineIntersection } from './LineUtil';
+import { GridRayUtil } from './GridRayUtil';
+import { LineUtil } from './LineUtil';
 import { getGridQuadrant } from './QuadrantUtil';
 import {
   getFirstNodeIndexInRing,
@@ -318,7 +318,7 @@ export const GridUtil = (function () {
       const intersectorDirection = IntersectorDirectionForQuadrant[targetQuadrant];
 
       // Let's create a GridRay that starts at targetCoord and goes in the direction of intersectorDirection
-      const targetIntersectorRay = createGridRay(targetCoord, intersectorDirection);
+      const targetIntersectorRay = GridRayUtil.createGridRay(targetCoord, intersectorDirection);
 
       // We need to get the direction of the leading corner for this quadrant
       const leadingCornerDirection = CornerDirectionForQuadrant[targetQuadrant];
@@ -328,12 +328,12 @@ export const GridUtil = (function () {
         targetQuadrant === GridQuadrant.PXNY ? cornerRay5Origin : origin2D;
 
       // Define a GridRay that starts at the cornerRayStartCoord and goes in the direction of the leading corner
-      const cornerRay = createGridRay(cornerRayStartCoord, leadingCornerDirection);
+      const cornerRay = GridRayUtil.createGridRay(cornerRayStartCoord, leadingCornerDirection);
 
       // Now we need to find the intersection point between targetIntersectorRay and originToCornerRay
-      const intersectionPoint = getLineIntersection(
-        targetIntersectorRay.asCartLine(),
-        cornerRay.asCartLine(),
+      const intersectionPoint = LineUtil.getIntersection(
+        LineUtil.getLineFromGridRay(targetIntersectorRay),
+        LineUtil.getLineFromGridRay(cornerRay),
       );
 
       if (intersectionPoint === undefined) {
